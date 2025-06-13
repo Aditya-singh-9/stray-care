@@ -28,7 +28,7 @@ const PaymentPage: React.FC = () => {
     }
 
     const options = {
-      key: 'rzp_test_qhB8ZBUZeloUik',  
+      key: 'rzp_live_9ZPuTwlbYq5GZo',  
       amount: amount * 100, 
       currency: "INR",
       name: "GullyStray Care",
