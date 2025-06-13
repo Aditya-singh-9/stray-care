@@ -76,12 +76,11 @@ const Services: React.FC = () => {
             <div>
               <h3 className="text-2xl md:text-3xl font-bold mb-4">Need Emergency Help?</h3>
               <p className="text-lg opacity-90 mb-6">
-                Our emergency response team is available 24/7 for animal rescue operations. 
-                Don't hesitate to contact us if you spot an animal in distress.
+                Our emergency response team is available 9:00 AM to 9:00PM for animal rescue operations. Don't hesitate to contact us if you spot an animal in distress.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <a href="tel:+911234567890" className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors text-center">
-                  Call Emergency: +91 12345 67890
+                <a href="tel:+91 93232 63322" className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors text-center">
+                  Call Emergency: +91 93232 63322 
                 </a>
                 <a href="mailto:emergency@gullystracare.org" className="border-2 border-white px-6 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors text-center">
                   Email Us

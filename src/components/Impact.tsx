@@ -41,13 +41,13 @@ const Impact: React.FC = () => {
               <div className="bg-white/10 rounded-xl p-6 border-l-4 border-amber-400">
                 <h4 className="text-xl font-semibold mb-3 text-amber-300">Medical Miracles</h4>
                 <p className="text-blue-100">
-                  Over 15,000 medical procedures performed, giving critically injured animals a second chance at life.
+                  Over 150+ medical procedures performed, giving critically injured animals a second chance at life.
                 </p>
               </div>
               <div className="bg-white/10 rounded-xl p-6 border-l-4 border-green-400">
                 <h4 className="text-xl font-semibold mb-3 text-green-300">Community Partnerships</h4>
                 <p className="text-blue-100">
-                  Working with 200+ local partners, shelters, and volunteers to create a network of care across India.
+                  Working with 10+ local partners, shelters, and volunteers to create a network of care across India.
                 </p>
               </div>
               <div className="bg-white/10 rounded-xl p-6 border-l-4 border-blue-400">
