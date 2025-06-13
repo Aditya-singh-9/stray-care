@@ -1,0 +1,41 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
+import Hero from './components/Hero';
+import About from './components/About';
+import Services from './components/Services';
+import Impact from './components/Impact';
+import Donation from './components/Donation';
+import Testimonials from './components/Testimonials';
+import Contact from './components/Contact';
+import Footer from './components/Footer';
+import PaymentPage from './components/PaymentPage';
+
+function HomePage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Header />
+      <Hero />
+      <About />
+      <Services />
+      <Impact />
+      <Donation />
+      <Testimonials />
+      <Contact />
+      <Footer />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/payment" element={<PaymentPage />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
