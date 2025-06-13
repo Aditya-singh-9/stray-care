@@ -6,7 +6,7 @@ const Services: React.FC = () => {
     {
       icon: Ambulance,
       title: "Emergency Rescue",
-      description: "24/7 emergency response team for injured and distressed street animals",
+      description: "Our emergency response team is available 9:00 AM to 9:00PM for guidance over a call",
       color: "bg-red-100 text-red-600",
       borderColor: "border-red-400"
     },
