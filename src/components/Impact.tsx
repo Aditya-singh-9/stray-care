@@ -4,10 +4,10 @@ import IMPACTImg from '../assets/images/impact.jpg';
 
 const Impact: React.FC = () => {
   const stats = [
-    { number: "5,247", label: "Animals Rescued", icon: Heart, color: "text-red-500", bgColor: "bg-red-100" },
-    { number: "3,892", label: "Successful Adoptions", icon: Users, color: "text-green-500", bgColor: "bg-green-100" },
-    { number: "12,000+", label: "Sterilizations Done", icon: TrendingUp, color: "text-blue-500", bgColor: "bg-blue-100" },
-    { number: "45", label: "Cities Covered", icon: MapPin, color: "text-purple-500", bgColor: "bg-purple-100" }
+    { number: "500+", label: "Animals Rescued", icon: Heart, color: "text-red-500", bgColor: "bg-red-100" },
+    { number: "200+", label: "Successful Adoptions", icon: Users, color: "text-green-500", bgColor: "bg-green-100" },
+    { number: "500+", label: "Sterilizations Done", icon: TrendingUp, color: "text-blue-500", bgColor: "bg-blue-100" },
+    { number: "10+", label: "Cities Covered", icon: MapPin, color: "text-purple-500", bgColor: "bg-purple-100" }
   ];
 
   return (
@@ -70,7 +70,7 @@ const Impact: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-2xl"></div>
             <div className="absolute bottom-6 left-6 right-6">
               <p className="text-white font-semibold text-lg mb-2">"Every rescue is a victory against suffering"</p>
-              <p className="text-gray-200 text-sm">- Dr. Sarah, Chief Veterinarian</p>
+              <p className="text-gray-200 text-sm">- Dr. Sarah</p>
             </div>
           </div>
         </div>
