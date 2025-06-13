@@ -87,7 +87,7 @@ Mumbai - 400086</p>
                     <h4 className="font-semibold text-gray-900">Office Hours</h4>
                     <p className="text-gray-600">Mon - Fri: 9:00 AM - 6:00 PM</p>
                     <p className="text-gray-600">Sat - Sun: 10:00 AM - 4:00 PM</p>
-                    <p className="text-sm text-amber-600 font-medium">Emergency services: 24/7</p>
+                    <p className="text-sm text-amber-600 font-medium"></p>
                   </div>
                 </div>
               </div>
