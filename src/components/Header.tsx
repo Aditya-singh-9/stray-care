@@ -35,7 +35,7 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-3">
             <img src={Logo} alt="GullyStray Care Logo" className="h-12 w-auto rounded-full shadow-sm" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">GullyStray Care</h1>
+              <h1 className="text-xl font-bold text-gray-900">GullyStrayCare</h1>
               <p className="text-xs text-blue-600 font-medium">Compassion in Action</p>
             </div>
           </div>

@@ -71,7 +71,7 @@ const Hero: React.FC = () => {
                   <Shield className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900">5000+</p>
+                  <p className="font-bold text-gray-900">500+</p>
                   <p className="text-gray-600 text-sm">Animals Rescued</p>
                 </div>
               </div>
@@ -83,7 +83,7 @@ const Hero: React.FC = () => {
                   <Users className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="font-bold text-gray-900">2000+</p>
+                  <p className="font-bold text-gray-900">200+</p>
                   <p className="text-gray-600 text-sm">Happy Adoptions</p>
                 </div>
               </div>
