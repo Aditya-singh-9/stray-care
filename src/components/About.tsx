@@ -19,7 +19,7 @@ const About: React.FC = () => {
 
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Our Mission</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-6"></h3>
             <p className="text-gray-600 mb-6 leading-relaxed">
               Gully Stray Care, an initiative by Gully Classes Foundation, was launched during the COVID-19 pandemic to support stray animals severely impacted by the lockdown. With streets deserted and resources cut off, countless animals were left hungry and injured. Our dedicated volunteers stepped in to provide food, clean water, and essential medical care — often in collaboration with compassionate local veterinarians.
 
