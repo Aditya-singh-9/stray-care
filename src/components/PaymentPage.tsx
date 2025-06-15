@@ -47,7 +47,7 @@ const PaymentPage = () => {
     phone: ''
   });
 
-  const predefinedAmounts: number[] = [100, 500, 1000, 2500, 5000];
+  const predefinedAmounts: number[] = [25,50,100,150,200];
 
   useEffect(() => {
     const script = document.createElement("script");

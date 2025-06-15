@@ -10,7 +10,7 @@ const PaymentPage: React.FC = () => {
     phone: ''
   });
 
-  const predefinedAmounts = [100, 500, 1000, 2500, 5000];
+  const predefinedAmounts = [25, 50, 100, 150, 200];
 
   useEffect(() => {
     const script = document.createElement("script");
