@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Shield, Lock, Award, Heart, Users, TrendingUp, MapPin, LucideIcon } from 'lucide-react';
-import Logpy from '../assets/images/logo-1.jpg';
+import { Shield, Lock, Award, Heart, Users, TrendingUp, MapPin } from 'lucide-react';
 import PersonalImage1 from '../assets/images/personal-image1.jpg';
 import PersonalImage2 from '../assets/images/personal-image2.jpg';
 import PersonalImage3 from '../assets/images/personal-image3.jpg';
 import PersonalImage4 from '../assets/images/personal-image4.jpg';
+import Logo from '../assets/images/logo-1.jpg';
 
 declare global {
   interface Window {
@@ -16,36 +16,17 @@ interface RazorpayResponse {
   razorpay_payment_id: string;
 }
 
-interface ImpactRowProps {
-  amount: number | string;
-  label: string;
-  desc: string;
-  color: string;
-}
-
-interface ImpactNumberProps {
-  Icon: LucideIcon;
-  num: number;
-  text: string;
-  color: string;
-}
-
-const colorMap: Record<string, string> = {
-  orange: 'bg-orange-100 text-orange-500',
-  green: 'bg-green-100 text-green-500',
-  blue: 'bg-blue-100 text-blue-500',
-  'red-400': 'text-red-400',
-  'green-400': 'text-green-400',
-  'blue-300': 'text-blue-300',
-  'purple-300': 'text-purple-300',
-};
-
 const PaymentPage = () => {
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
   const [donorInfo, setDonorInfo] = useState({ name: '', email: '', phone: '' });
   const [error, setError] = useState<string | null>(null);
-  const predefinedAmounts = [25, 50, 100, 150, 200];
+  const [taxExemption, setTaxExemption] = useState(false);
+  const [pan, setPan] = useState('');
+  const [aadhaar, setAadhaar] = useState('');
+  const [address, setAddress] = useState('');
+
+  const predefinedAmounts = [25, 50, 100, 500, 1000, 5000];
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -60,8 +41,6 @@ const PaymentPage = () => {
       setError("Please fill in all fields and ensure a valid amount.");
       return false;
     }
-
-    // Optional email and phone validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
     if (!emailRegex.test(donorInfo.email)) {
@@ -72,223 +51,177 @@ const PaymentPage = () => {
       setError("Please enter a valid 10-digit phone number.");
       return false;
     }
-
+    if (taxExemption && (!pan || !aadhaar || !address)) {
+      setError("Please fill PAN, Aadhaar, and Address for 80G exemption.");
+      return false;
+    }
     setError(null);
     return true;
   };
 
   const handleDonation = () => {
     if (!validateForm()) return;
-
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
-
     const options = {
       key: 'rzp_live_9ZPuTwlbYq5GZo',
       amount: amount * 100,
       currency: "INR",
       name: "GullyStray Care",
       description: "Thank you for your contribution",
-      image: Logpy,
+      image: '/logo-1.jpg',
       handler: function (response: RazorpayResponse) {
         alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
-        console.log("Payment Details:", response);
+        if (taxExemption) {
+          console.log("Tax Details: ", { pan, aadhaar, address });
+        }
       },
       prefill: donorInfo,
       notes: {
-        donation_purpose: "Animal Rescue"
+        donation_purpose: "Animal Rescue",
+        pan,
+        aadhaar,
+        address
       },
-      theme: {
-        color: "#F37254"
-      },
-      method: {
-        netbanking: true,
-        card: true,
-        upi: true,
-        wallet: true
-      }
+      theme: { color: "#F37254" },
+      method: { netbanking: true, card: true, upi: true, wallet: true }
     };
 
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
 
-  const navigate = (path: string) => {
-    window.location.href = path;
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-blue-50">
+    <div className="bg-gray-50 min-h-screen pb-10">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <img src={Logpy} alt="Logo" className="h-14 w-14 rounded-full object-cover border-2 border-amber-400 shadow-md" />
+      <header className="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
+          <div className="flex items-center space-x-3">
+            <img src={Logo} alt="Logo" className="h-12 w-12 rounded-full border" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">GullyStrayCare</h1>
-              <p className="text-sm text-blue-600 font-medium">Compassion in Action</p>
+              <h1 className="font-bold text-lg">GullyStrayCare</h1>
+              <p className="text-sm text-blue-600">Compassion in Action</p>
             </div>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
-            {['Home', 'About', 'Services', 'Impact', 'Contact'].map((item) => (
-              <button key={item} onClick={() => navigate('/')} className="text-gray-800 font-medium hover:text-blue-600">
-                {item}
-              </button>
-            ))}
-          </nav>
-          <button onClick={() => navigate('/payment')} className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white px-6 py-2 rounded-full font-semibold shadow-md hover:scale-105 transition">
+          <button className="mt-3 md:mt-0 bg-yellow-400 hover:bg-yellow-500 transition-all duration-300 text-white font-semibold py-2 px-6 rounded-full shadow-lg">
             Donate Now
           </button>
         </div>
       </header>
 
-      {/* Main Form & Sidebar */}
-      <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Donation Form */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 sm:p-10 border">
-          <h2 className="text-3xl font-bold mb-6 text-center sm:text-left">Make a Secure Donation</h2>
+      {/* Main Form & Side Section */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 p-4 sm:p-6 mt-10 transition-all duration-300">
+        {/* Left Form */}
+        <div className="col-span-2 bg-white p-6 sm:p-8 rounded-2xl shadow-md border transition-all duration-300">
+          <h2 className="text-2xl font-bold mb-6">Make a Secure Donation</h2>
 
-          {/* Error Message */}
-          {error && (
-            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-              {error}
-            </div>
-          )}
+          {error && <div className="p-3 mb-4 bg-red-100 border text-red-600 rounded transition-all">{error}</div>}
 
-          {/* Amount Selection */}
-          <div className="mb-8">
-            <label className="block font-semibold mb-4">Select Amount</label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
+          <div className="mb-6">
+            <label className="font-semibold mb-2 block">Select Amount</label>
+            <div className="flex flex-wrap gap-3 mb-3">
               {predefinedAmounts.map((amt) => (
-                <button
-                  key={amt}
-                  onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
-                  className={`p-3 rounded-xl border font-semibold transition ${selectedAmount === amt && !customAmount ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-md' : 'border-gray-200 hover:border-amber-300'}`}
-                >
+                <button key={amt} onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
+                  className={`py-2 px-5 rounded-lg border font-semibold transition-all duration-200 
+                  ${selectedAmount === amt && !customAmount ? 'border-yellow-400 bg-yellow-50 text-yellow-700' : 'border-gray-200 hover:border-yellow-300 hover:scale-105'}`}>
                   ₹{amt}
                 </button>
               ))}
             </div>
-            <input
-              type="number"
-              placeholder="Custom Amount (₹)"
-              value={customAmount}
+            <input type="number" placeholder="Custom Amount (₹)" value={customAmount}
               onChange={(e) => setCustomAmount(e.target.value)}
-              className="w-full p-4 border rounded-xl focus:ring-amber-500 text-lg"
-            />
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-200" />
           </div>
 
-          {/* Donor Info */}
-          <div className="mb-8">
-            <label className="block font-semibold mb-4">Donor Information</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <input
-                type="text"
-                placeholder="Full Name *"
-                value={donorInfo.name}
+          <div className="mb-6">
+            <label className="font-semibold mb-2 block">Donor Information</label>
+            <div className="flex flex-col md:flex-row gap-4 mb-3">
+              <input type="text" placeholder="Full Name *" value={donorInfo.name}
                 onChange={(e) => setDonorInfo({ ...donorInfo, name: e.target.value })}
-                className="p-4 border rounded-xl"
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email *"
-                value={donorInfo.email}
+                className="w-full p-3 border rounded-lg" />
+              <input type="email" placeholder="Email *" value={donorInfo.email}
                 onChange={(e) => setDonorInfo({ ...donorInfo, email: e.target.value })}
-                className="p-4 border rounded-xl"
-                required
-              />
+                className="w-full p-3 border rounded-lg" />
             </div>
-            <input
-              type="tel"
-              placeholder="Phone *"
-              value={donorInfo.phone}
+            <input type="tel" placeholder="Phone *" value={donorInfo.phone}
               onChange={(e) => setDonorInfo({ ...donorInfo, phone: e.target.value })}
-              className="w-full p-4 border rounded-xl"
-              required
-            />
+              className="w-full p-3 border rounded-lg" />
           </div>
 
-          {/* Pay Button */}
-          <button
-            onClick={handleDonation}
-            className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white py-4 rounded-xl font-semibold text-lg flex items-center justify-center hover:scale-105 transition"
-          >
+          {/* 80G Exemption */}
+          <div className="mb-6">
+            <label className="flex items-center gap-2">
+              <input type="checkbox" checked={taxExemption} onChange={(e) => setTaxExemption(e.target.checked)} />
+              Claim 80G Tax Exemption?
+            </label>
+            {taxExemption && (
+              <div className="mt-4 space-y-3">
+                <input type="text" placeholder="PAN Number *" value={pan}
+                  onChange={(e) => setPan(e.target.value)} className="w-full p-3 border rounded-lg" />
+                <input type="text" placeholder="Aadhaar Number *" value={aadhaar}
+                  onChange={(e) => setAadhaar(e.target.value)} className="w-full p-3 border rounded-lg" />
+                <textarea rows={3} placeholder="Full Address *" value={address}
+                  onChange={(e) => setAddress(e.target.value)} className="w-full p-3 border rounded-lg" />
+              </div>
+            )}
+          </div>
+
+          <button onClick={handleDonation} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 text-white py-3 rounded-lg font-semibold flex justify-center items-center shadow-lg">
             <Lock className="h-5 w-5 mr-2" /> Donate ₹{customAmount || selectedAmount}
           </button>
 
-          <div className="flex justify-center mt-4 text-sm text-gray-600">
-            <Shield className="h-4 w-4 text-green-500 mr-2" /> SSL Encrypted • PCI DSS Compliant
+          <div className="mt-4 text-center text-sm text-gray-600 flex justify-center items-center">
+            <Shield className="h-4 w-4 mr-2 text-green-500" /> SSL Encrypted • PCI DSS Compliant
           </div>
         </div>
 
-        {/* Memories & Impact Side Panel */}
-        <div className="space-y-6">
-          <div className="bg-white p-6 rounded-2xl shadow-lg border">
-            <h4 className="text-xl font-bold mb-4 flex items-center justify-between">
-              <span className="flex items-center">
-                <Award className="h-6 w-6 text-amber-500 mr-2" /> Memories
-              </span>
-              <button
-                onClick={() => navigate('/gallery')}
-                className="text-green-700 text-sm font-semibold hover:underline"
-              >
-                VIEW ALL
-              </button>
-            </h4>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {/* Right Section */}
+        <div className="space-y-6 transition-all duration-300">
+          {/* Memories */}
+          <div className="bg-white p-6 rounded-2xl shadow-md border">
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-bold flex items-center"><Award className="text-yellow-500 mr-2" /> Memories</h4>
+              <span className="text-green-700 text-sm font-semibold cursor-pointer">VIEW ALL</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               {[PersonalImage1, PersonalImage2, PersonalImage3, PersonalImage4].map((img, idx) => (
-                <div key={idx} className="overflow-hidden rounded-xl border shadow-sm hover:shadow-md transition">
-                  <img src={img} alt={`Memory ${idx + 1}`} className="w-full h-40 object-cover" />
-                </div>
+                <img key={idx} src={img} className="w-full h-24 object-cover rounded-lg border transition-all duration-300 hover:scale-105" />
               ))}
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-2xl shadow-lg border">
-            <h4 className="text-xl font-bold mb-4 flex items-center">
-              <Award className="h-6 w-6 text-amber-500 mr-2" /> Your Impact
-            </h4>
-            <div className="space-y-4">
-              <ImpactRow amount={100} label="Feeds 5 street dogs" desc="Nutritious meals" color="orange" />
-              <ImpactRow amount={500} label="Basic medical care" desc="Vaccines & treatment" color="green" />
-              <ImpactRow amount={2500} label="Emergency surgery" desc="Life-saving procedures" color="blue" />
+          {/* Your Impact */}
+          <div className="bg-white p-6 rounded-2xl shadow-md border">
+            <h4 className="font-bold mb-4 flex items-center"><Award className="text-yellow-500 mr-2" /> Your Impact</h4>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-3"><span className="font-bold text-orange-500">₹100</span> Feeds 5 street dogs</div>
+              <div className="flex items-center gap-3"><span className="font-bold text-green-500">₹500</span> Basic medical care</div>
+              <div className="flex items-center gap-3"><span className="font-bold text-blue-500">₹2500</span> Emergency surgery</div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
 
-      {/* Impact Section */}
-      <section className="bg-gradient-to-r from-blue-700 to-blue-800 py-20 text-white text-center">
-        <h2 className="text-4xl font-bold mb-4">Our Impact</h2>
-        <p className="text-lg mb-10">Every number represents a life saved, a family completed, and a community made more compassionate</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          <ImpactNumber Icon={Heart} num={550} text="Animals Rescued" color="red-400" />
-          <ImpactNumber Icon={Users} num={223} text="Successful Adoptions" color="green-400" />
-          <ImpactNumber Icon={TrendingUp} num={545} text="Sterilizations Done" color="blue-300" />
-          <ImpactNumber Icon={MapPin} num={12} text="Cities Covered" color="purple-300" />
+      {/* Our Impact */}
+      <div className="bg-blue-600 text-white py-12 mt-10 transition-all duration-300">
+        <h2 className="text-3xl font-bold text-center mb-4">Our Impact</h2>
+        <p className="text-center mb-10">Every number represents a life saved, a family completed, and a community made more compassionate</p>
+        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
+          <ImpactBox icon={<Heart className="text-orange-500" />} num={550} label="Animals Rescued" />
+          <ImpactBox icon={<Users className="text-green-500" />} num={223} label="Successful Adoptions" />
+          <ImpactBox icon={<TrendingUp className="text-blue-500" />} num={545} label="Sterilizations Done" />
+          <ImpactBox icon={<MapPin className="text-pink-400" />} num={12} label="Cities Covered" />
         </div>
-      </section>
+      </div>
     </div>
   );
 };
 
-const ImpactRow = ({ amount, label, desc, color }: ImpactRowProps) => (
-  <div className="flex items-center gap-4">
-    <div className={`h-10 w-10 flex items-center justify-center rounded-full font-bold ${colorMap[color]}`}>
-      ₹{amount}
-    </div>
-    <div>
-      <p className="font-semibold">{label}</p>
-      <p className="text-sm text-gray-500">{desc}</p>
-    </div>
-  </div>
-);
-
-const ImpactNumber = ({ Icon, num, text, color }: ImpactNumberProps) => (
-  <div className="bg-blue-600 rounded-xl p-8 shadow-lg">
-    <Icon className={`h-12 w-12 mx-auto mb-4 ${colorMap[color]}`} />
+// Reusable Component for Impact Section
+const ImpactBox = ({ icon, num, label }: { icon: JSX.Element, num: number, label: string }) => (
+  <div className="bg-white rounded-xl text-center p-6 shadow-md text-black">
+    <div className="flex justify-center text-4xl mb-4">{icon}</div>
     <h3 className="text-3xl font-bold">{num}</h3>
-    <p className="mt-2">{text}</p>
+    <p className="mt-2">{label}</p>
   </div>
 );
 
