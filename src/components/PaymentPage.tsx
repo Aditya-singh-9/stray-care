@@ -1,19 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Shield, Lock, Award, Heart, Users, TrendingUp, MapPin, LucideIcon } from 'lucide-react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/autoplay';
-
 import Logpy from '../assets/images/logo-1.jpg';
 import PersonalImage1 from '../assets/images/personal-image1.jpg';
 import PersonalImage2 from '../assets/images/personal-image2.jpg';
 import PersonalImage3 from '../assets/images/personal-image3.jpg';
 import PersonalImage4 from '../assets/images/personal-image4.jpg';
 
-// Extend window for Razorpay
 declare global {
   interface Window {
     Razorpay: any;
@@ -38,16 +30,22 @@ interface ImpactNumberProps {
   color: string;
 }
 
+const colorMap: Record<string, string> = {
+  orange: 'bg-orange-100 text-orange-500',
+  green: 'bg-green-100 text-green-500',
+  blue: 'bg-blue-100 text-blue-500',
+  'red-400': 'text-red-400',
+  'green-400': 'text-green-400',
+  'blue-300': 'text-blue-300',
+  'purple-300': 'text-purple-300',
+};
+
 const PaymentPage = () => {
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
-  const [donorInfo, setDonorInfo] = useState<{ name: string; email: string; phone: string }>({
-    name: '',
-    email: '',
-    phone: ''
-  });
-
-  const predefinedAmounts: number[] = [25,50,100,150,200];
+  const [donorInfo, setDonorInfo] = useState({ name: '', email: '', phone: '' });
+  const [error, setError] = useState<string | null>(null);
+  const predefinedAmounts = [25, 50, 100, 150, 200];
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -56,12 +54,33 @@ const PaymentPage = () => {
     document.body.appendChild(script);
   }, []);
 
-  const handleDonation = () => {
+  const validateForm = () => {
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
-    if (!donorInfo.name || !donorInfo.email || !donorInfo.phone) {
-      alert('Please fill all donor details.');
-      return;
+    if (!donorInfo.name || !donorInfo.email || !donorInfo.phone || isNaN(amount) || amount <= 0) {
+      setError("Please fill in all fields and ensure a valid amount.");
+      return false;
     }
+
+    // Optional email and phone validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!emailRegex.test(donorInfo.email)) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
+    if (!phoneRegex.test(donorInfo.phone)) {
+      setError("Please enter a valid 10-digit phone number.");
+      return false;
+    }
+
+    setError(null);
+    return true;
+  };
+
+  const handleDonation = () => {
+    if (!validateForm()) return;
+
+    const amount = customAmount ? parseInt(customAmount) : selectedAmount;
 
     const options = {
       key: 'rzp_live_9ZPuTwlbYq5GZo',
@@ -74,11 +93,7 @@ const PaymentPage = () => {
         alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
         console.log("Payment Details:", response);
       },
-      prefill: {
-        name: donorInfo.name,
-        email: donorInfo.email,
-        contact: donorInfo.phone
-      },
+      prefill: donorInfo,
       notes: {
         donation_purpose: "Animal Rescue"
       },
@@ -93,8 +108,8 @@ const PaymentPage = () => {
       }
     };
 
-    const rzp1 = new window.Razorpay(options);
-    rzp1.open();
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
 
   const navigate = (path: string) => {
@@ -103,6 +118,7 @@ const PaymentPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-blue-50">
+      {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
@@ -125,10 +141,20 @@ const PaymentPage = () => {
         </div>
       </header>
 
+      {/* Main Form & Sidebar */}
       <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
+        {/* Donation Form */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 sm:p-10 border">
           <h2 className="text-3xl font-bold mb-6 text-center sm:text-left">Make a Secure Donation</h2>
 
+          {/* Error Message */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          {/* Amount Selection */}
           <div className="mb-8">
             <label className="block font-semibold mb-4">Select Amount</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-4">
@@ -151,6 +177,7 @@ const PaymentPage = () => {
             />
           </div>
 
+          {/* Donor Info */}
           <div className="mb-8">
             <label className="block font-semibold mb-4">Donor Information</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -181,6 +208,7 @@ const PaymentPage = () => {
             />
           </div>
 
+          {/* Pay Button */}
           <button
             onClick={handleDonation}
             className="w-full bg-gradient-to-r from-amber-400 to-yellow-500 text-white py-4 rounded-xl font-semibold text-lg flex items-center justify-center hover:scale-105 transition"
@@ -193,25 +221,27 @@ const PaymentPage = () => {
           </div>
         </div>
 
+        {/* Memories & Impact Side Panel */}
         <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl shadow-lg border">
-            <h4 className="text-xl font-bold mb-4 flex items-center">
-              <Award className="h-6 w-6 text-amber-500 mr-2" /> MEMORIES
+            <h4 className="text-xl font-bold mb-4 flex items-center justify-between">
+              <span className="flex items-center">
+                <Award className="h-6 w-6 text-amber-500 mr-2" /> Memories
+              </span>
+              <button
+                onClick={() => navigate('/gallery')}
+                className="text-green-700 text-sm font-semibold hover:underline"
+              >
+                VIEW ALL
+              </button>
             </h4>
-
-            <Swiper
-              modules={[Navigation, Pagination, Autoplay]}
-              autoplay={{ delay: 3000 }}
-              pagination={{ clickable: true }}
-              loop
-              className="rounded-xl"
-            >
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               {[PersonalImage1, PersonalImage2, PersonalImage3, PersonalImage4].map((img, idx) => (
-                <SwiperSlide key={idx}>
-                  <img src={img} alt={`Memory ${idx + 1}`} className="rounded-xl w-full object-cover max-h-80" />
-                </SwiperSlide>
+                <div key={idx} className="overflow-hidden rounded-xl border shadow-sm hover:shadow-md transition">
+                  <img src={img} alt={`Memory ${idx + 1}`} className="w-full h-40 object-cover" />
+                </div>
               ))}
-            </Swiper>
+            </div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl shadow-lg border">
@@ -227,6 +257,7 @@ const PaymentPage = () => {
         </div>
       </main>
 
+      {/* Impact Section */}
       <section className="bg-gradient-to-r from-blue-700 to-blue-800 py-20 text-white text-center">
         <h2 className="text-4xl font-bold mb-4">Our Impact</h2>
         <p className="text-lg mb-10">Every number represents a life saved, a family completed, and a community made more compassionate</p>
@@ -243,7 +274,7 @@ const PaymentPage = () => {
 
 const ImpactRow = ({ amount, label, desc, color }: ImpactRowProps) => (
   <div className="flex items-center gap-4">
-    <div className={`h-10 w-10 flex items-center justify-center rounded-full bg-${color}-100 text-${color}-500 font-bold`}>
+    <div className={`h-10 w-10 flex items-center justify-center rounded-full font-bold ${colorMap[color]}`}>
       ₹{amount}
     </div>
     <div>
@@ -255,7 +286,7 @@ const ImpactRow = ({ amount, label, desc, color }: ImpactRowProps) => (
 
 const ImpactNumber = ({ Icon, num, text, color }: ImpactNumberProps) => (
   <div className="bg-blue-600 rounded-xl p-8 shadow-lg">
-    <Icon className={`h-12 w-12 mx-auto text-${color} mb-4`} />
+    <Icon className={`h-12 w-12 mx-auto mb-4 ${colorMap[color]}`} />
     <h3 className="text-3xl font-bold">{num}</h3>
     <p className="mt-2">{text}</p>
   </div>
