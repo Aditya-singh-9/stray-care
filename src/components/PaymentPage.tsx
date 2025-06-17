@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Lock, Award, Heart, Users, TrendingUp, MapPin } from 'lucide-react';
+import {
+  Shield, Lock, Award, Heart, Users, TrendingUp, MapPin
+} from 'lucide-react';
+
 import PersonalImage1 from '../assets/images/personal-image1.jpg';
 import PersonalImage2 from '../assets/images/personal-image2.jpg';
 import PersonalImage3 from '../assets/images/personal-image3.jpg';
 import PersonalImage4 from '../assets/images/personal-image4.jpg';
-import Logo from '../assets/images/logo-1.jpg';
+import Logo from '../assets/images/logo-1.jpg'; // ✅ Proper logo import
 
 declare global {
   interface Window {
@@ -31,10 +34,12 @@ const PaymentPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
+    if (!window.Razorpay) {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
   }, []);
 
   const validateFields = (): boolean => {
@@ -74,26 +79,55 @@ const PaymentPage = () => {
     const options = {
       key: 'rzp_live_9ZPuTwlbYq5GZo',
       amount: amount * 100,
-      currency: "INR",
-      name: "GullyStray Care",
-      description: "Thank you for your contribution",
-      image: '/logo-1.jpg',
-      handler: (response: RazorpayResponse) => {
-        navigate('/thank-you', {
-          state: {
-            name: donorInfo.name,
-            amount: customAmount || selectedAmount,
-            paymentId: response.razorpay_payment_id,
-          },
-        });
+      currency: 'INR',
+      name: 'GullyStray Care',
+      description: 'Thank you for your contribution',
+      image: Logo, // ✅ uses imported image
+      handler: function (response: RazorpayResponse) {
+        if (response?.razorpay_payment_id) {
+          navigate('/thank-you', {
+            state: {
+              name: donorInfo.name,
+              amount: customAmount || selectedAmount,
+              paymentId: response.razorpay_payment_id,
+            },
+          });
+        } else {
+          alert('Payment was not completed.');
+        }
       },
-      prefill: donorInfo,
-      notes: { donation_purpose: "Animal Rescue", pan, aadhaar, address },
+      prefill: {
+        name: donorInfo.name,
+        email: donorInfo.email,
+        contact: donorInfo.phone,
+      },
+      notes: {
+        donation_purpose: "Animal Rescue",
+        pan,
+        aadhaar,
+        address,
+      },
       theme: { color: "#F37254" },
-      method: { netbanking: true, card: true, upi: true, wallet: true }
+      method: {
+        netbanking: true,
+        card: true,
+        upi: true,
+        wallet: true
+      },
+      modal: {
+        escape: true,
+        ondismiss: function () {
+          alert("Payment was cancelled.");
+        }
+      }
     };
 
     const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response: any) {
+      console.error("Payment Failed:", response);
+      alert("Payment failed. Please try again.");
+    });
+
     rzp.open();
   };
 
