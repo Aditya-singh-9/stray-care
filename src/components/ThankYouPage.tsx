@@ -1,19 +1,40 @@
+import { useLocation } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 const ThankYouPage = () => {
+  const location = useLocation();
+  const { name, amount, paymentId } = location.state || {};
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-yellow-100 to-white p-4">
-      <div className="bg-white p-10 rounded-3xl shadow-xl text-center max-w-md transition-all">
-        <CheckCircle className="text-green-500 mx-auto mb-6" size={80} />
-        <h1 className="text-3xl font-bold mb-4">Thank You!</h1>
-        <p className="text-gray-600 mb-6">
-          Your donation has been successfully received. We truly appreciate your generosity and support for our cause.
-        </p>
-        <Link to="/" className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-3 px-8 rounded-full transition-all duration-300 shadow-lg">
-          Go Back to Home
-        </Link>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-green-100 via-white to-blue-100 px-4 py-10 text-center">
+      {/* Success Icon Animation */}
+      <div className="animate-pulse mb-6">
+        <CheckCircle className="text-green-500" size={80} />
       </div>
+
+      {/* Thank You Message */}
+      <h1 className="text-4xl sm:text-5xl font-extrabold text-green-700 mb-4">
+        Thank You, {name || 'Donor'}! 💚
+      </h1>
+      <p className="text-lg sm:text-xl text-gray-800 mb-2">
+        Your donation of <span className="font-semibold text-green-600">₹{amount}</span> was successful.
+      </p>
+      <p className="text-sm text-gray-600 mb-6">
+        Payment ID: <span className="font-mono">{paymentId}</span>
+      </p>
+
+      {/* Quote or Feel-Good Message */}
+      <blockquote className="italic text-md text-gray-700 max-w-xl mx-auto mb-8">
+        "The smallest act of kindness is worth more than the grandest intention."
+      </blockquote>
+
+      {/* Call to Action / Navigation */}
+      <a
+        href="/"
+        className="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-full font-semibold shadow-lg transition transform hover:scale-105"
+      >
+        Return to Home
+      </a>
     </div>
   );
 };

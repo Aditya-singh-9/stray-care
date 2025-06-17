@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Shield, Lock, Award, Heart, Users, TrendingUp, MapPin } from 'lucide-react';
 import PersonalImage1 from '../assets/images/personal-image1.jpg';
 import PersonalImage2 from '../assets/images/personal-image2.jpg';
@@ -16,6 +17,8 @@ interface RazorpayResponse {
   razorpay_payment_id: string;
 }
 
+const predefinedAmounts = [25, 50, 100, 500, 1000, 5000];
+
 const PaymentPage = () => {
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
@@ -25,8 +28,7 @@ const PaymentPage = () => {
   const [pan, setPan] = useState('');
   const [aadhaar, setAadhaar] = useState('');
   const [address, setAddress] = useState('');
-
-  const predefinedAmounts = [25, 50, 100, 500, 1000, 5000];
+  const navigate = useNavigate();
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -35,33 +37,40 @@ const PaymentPage = () => {
     document.body.appendChild(script);
   }, []);
 
-  const validateForm = () => {
+  const validateFields = (): boolean => {
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
-    if (!donorInfo.name || !donorInfo.email || !donorInfo.phone || isNaN(amount) || amount <= 0) {
-      setError("Please fill in all fields and ensure a valid amount.");
-      return false;
-    }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
+
+    if (!donorInfo.name || !donorInfo.email || !donorInfo.phone || isNaN(amount) || amount <= 0) {
+      setError("Please fill all required fields and enter a valid amount.");
+      return false;
+    }
+
     if (!emailRegex.test(donorInfo.email)) {
-      setError("Please enter a valid email address.");
+      setError("Invalid email address.");
       return false;
     }
+
     if (!phoneRegex.test(donorInfo.phone)) {
-      setError("Please enter a valid 10-digit phone number.");
+      setError("Invalid 10-digit phone number.");
       return false;
     }
+
     if (taxExemption && (!pan || !aadhaar || !address)) {
-      setError("Please fill PAN, Aadhaar, and Address for 80G exemption.");
+      setError("PAN, Aadhaar, and address are required for 80G exemption.");
       return false;
     }
+
     setError(null);
     return true;
   };
 
-  const handleDonation = () => {
-    if (!validateForm()) return;
+  const handlePayment = () => {
+    if (!validateFields()) return;
+
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
+
     const options = {
       key: 'rzp_live_9ZPuTwlbYq5GZo',
       amount: amount * 100,
@@ -69,19 +78,17 @@ const PaymentPage = () => {
       name: "GullyStray Care",
       description: "Thank you for your contribution",
       image: '/logo-1.jpg',
-      handler: function (response: RazorpayResponse) {
-        alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
-        if (taxExemption) {
-          console.log("Tax Details: ", { pan, aadhaar, address });
-        }
+      handler: (response: RazorpayResponse) => {
+        navigate('/thank-you', {
+          state: {
+            name: donorInfo.name,
+            amount: customAmount || selectedAmount,
+            paymentId: response.razorpay_payment_id,
+          },
+        });
       },
       prefill: donorInfo,
-      notes: {
-        donation_purpose: "Animal Rescue",
-        pan,
-        aadhaar,
-        address
-      },
+      notes: { donation_purpose: "Animal Rescue", pan, aadhaar, address },
       theme: { color: "#F37254" },
       method: { netbanking: true, card: true, upi: true, wallet: true }
     };
@@ -91,50 +98,50 @@ const PaymentPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-10">
-      {/* Header */}
-      <header className="bg-white shadow-md sticky top-0 z-50 transition-all duration-300">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between px-4 py-3">
-          <div className="flex items-center space-x-3">
+    <div className="bg-gray-50 min-h-screen">
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between px-4 py-3 gap-4">
+          <div className="flex items-center gap-3">
             <img src={Logo} alt="Logo" className="h-12 w-12 rounded-full border" />
             <div>
-              <h1 className="font-bold text-lg">GullyStrayCare</h1>
+              <h1 className="font-bold text-xl">GullyStrayCare</h1>
               <p className="text-sm text-blue-600">Compassion in Action</p>
             </div>
           </div>
-          <button className="mt-3 md:mt-0 bg-yellow-400 hover:bg-yellow-500 transition-all duration-300 text-white font-semibold py-2 px-6 rounded-full shadow-lg">
-            Donate Now
-          </button>
+          <nav className="flex flex-wrap justify-center gap-4 text-sm font-semibold text-gray-800">
+            <a href="/" className="hover:text-blue-600 transition-colors">Home</a>
+            <a href="/" className="hover:text-blue-600 transition-colors">About</a>
+            <a href="/" className="hover:text-blue-600 transition-colors">Services</a>
+            <a href="/" className="hover:text-blue-600 transition-colors">Impact</a>
+            <a href="/" className="hover:text-blue-600 transition-colors">Contact</a>
+          </nav>
         </div>
       </header>
 
-      {/* Main Form & Side Section */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 p-4 sm:p-6 mt-10 transition-all duration-300">
-        {/* Left Form */}
-        <div className="col-span-2 bg-white p-6 sm:p-8 rounded-2xl shadow-md border transition-all duration-300">
+      <main className="max-w-7xl mx-auto p-4 sm:p-6 mt-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <section className="col-span-2 bg-white p-6 sm:p-8 rounded-2xl shadow-md border">
           <h2 className="text-2xl font-bold mb-6">Make a Secure Donation</h2>
-
-          {error && <div className="p-3 mb-4 bg-red-100 border text-red-600 rounded transition-all">{error}</div>}
+          {error && <div className="p-3 mb-4 bg-red-100 border text-red-600 rounded">{error}</div>}
 
           <div className="mb-6">
-            <label className="font-semibold mb-2 block">Select Amount</label>
+            <label className="font-semibold block mb-2">Select Amount</label>
             <div className="flex flex-wrap gap-3 mb-3">
               {predefinedAmounts.map((amt) => (
                 <button key={amt} onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
-                  className={`py-2 px-5 rounded-lg border font-semibold transition-all duration-200 
-                  ${selectedAmount === amt && !customAmount ? 'border-yellow-400 bg-yellow-50 text-yellow-700' : 'border-gray-200 hover:border-yellow-300 hover:scale-105'}`}>
+                  className={`py-2 px-5 rounded-lg border font-semibold transition-all duration-200
+                    ${selectedAmount === amt && !customAmount ? 'border-yellow-400 bg-yellow-50 text-yellow-700' : 'border-gray-200 hover:border-yellow-300 hover:scale-105'}`}>
                   ₹{amt}
                 </button>
               ))}
             </div>
             <input type="number" placeholder="Custom Amount (₹)" value={customAmount}
               onChange={(e) => setCustomAmount(e.target.value)}
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-200" />
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300" />
           </div>
 
           <div className="mb-6">
-            <label className="font-semibold mb-2 block">Donor Information</label>
-            <div className="flex flex-col md:flex-row gap-4 mb-3">
+            <label className="font-semibold block mb-2">Donor Information</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
               <input type="text" placeholder="Full Name *" value={donorInfo.name}
                 onChange={(e) => setDonorInfo({ ...donorInfo, name: e.target.value })}
                 className="w-full p-3 border rounded-lg" />
@@ -147,7 +154,6 @@ const PaymentPage = () => {
               className="w-full p-3 border rounded-lg" />
           </div>
 
-          {/* 80G Exemption */}
           <div className="mb-6">
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={taxExemption} onChange={(e) => setTaxExemption(e.target.checked)} />
@@ -165,31 +171,29 @@ const PaymentPage = () => {
             )}
           </div>
 
-          <button onClick={handleDonation} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 text-white py-3 rounded-lg font-semibold flex justify-center items-center shadow-lg">
+          <button onClick={handlePayment}
+            className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-white py-3 rounded-lg font-semibold flex justify-center items-center shadow-lg">
             <Lock className="h-5 w-5 mr-2" /> Donate ₹{customAmount || selectedAmount}
           </button>
 
-          <div className="mt-4 text-center text-sm text-gray-600 flex justify-center items-center">
+          <p className="mt-4 text-center text-sm text-gray-600 flex justify-center items-center">
             <Shield className="h-4 w-4 mr-2 text-green-500" /> SSL Encrypted • PCI DSS Compliant
-          </div>
-        </div>
+          </p>
+        </section>
 
-        {/* Right Section */}
-        <div className="space-y-6 transition-all duration-300">
-          {/* Memories */}
+        <aside className="space-y-6">
           <div className="bg-white p-6 rounded-2xl shadow-md border">
             <div className="flex justify-between items-center mb-4">
               <h4 className="font-bold flex items-center"><Award className="text-yellow-500 mr-2" /> Memories</h4>
               <span className="text-green-700 text-sm font-semibold cursor-pointer">VIEW ALL</span>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[PersonalImage1, PersonalImage2, PersonalImage3, PersonalImage4].map((img, idx) => (
-                <img key={idx} src={img} className="w-full h-24 object-cover rounded-lg border transition-all duration-300 hover:scale-105" />
+                <img key={idx} src={img} alt={`Memory ${idx + 1}`} className="w-full h-24 object-cover rounded-lg border hover:scale-105 transition-all duration-300" />
               ))}
             </div>
           </div>
 
-          {/* Your Impact */}
           <div className="bg-white p-6 rounded-2xl shadow-md border">
             <h4 className="font-bold mb-4 flex items-center"><Award className="text-yellow-500 mr-2" /> Your Impact</h4>
             <div className="space-y-3 text-sm">
@@ -198,25 +202,23 @@ const PaymentPage = () => {
               <div className="flex items-center gap-3"><span className="font-bold text-blue-500">₹2500</span> Emergency surgery</div>
             </div>
           </div>
-        </div>
-      </div>
+        </aside>
+      </main>
 
-      {/* Our Impact */}
-      <div className="bg-blue-600 text-white py-12 mt-10 transition-all duration-300">
+      <section className="bg-blue-600 text-white py-12 mt-10">
         <h2 className="text-3xl font-bold text-center mb-4">Our Impact</h2>
         <p className="text-center mb-10">Every number represents a life saved, a family completed, and a community made more compassionate</p>
-        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
+        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 px-4">
           <ImpactBox icon={<Heart className="text-orange-500" />} num={550} label="Animals Rescued" />
           <ImpactBox icon={<Users className="text-green-500" />} num={223} label="Successful Adoptions" />
           <ImpactBox icon={<TrendingUp className="text-blue-500" />} num={545} label="Sterilizations Done" />
           <ImpactBox icon={<MapPin className="text-pink-400" />} num={12} label="Cities Covered" />
         </div>
-      </div>
+      </section>
     </div>
   );
 };
 
-// Reusable Component for Impact Section
 const ImpactBox = ({ icon, num, label }: { icon: JSX.Element, num: number, label: string }) => (
   <div className="bg-white rounded-xl text-center p-6 shadow-md text-black">
     <div className="flex justify-center text-4xl mb-4">{icon}</div>

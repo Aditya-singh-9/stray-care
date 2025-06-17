@@ -9,6 +9,7 @@ import Services from './components/Services';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import PaymentPage from './components/PaymentPage';
+import ThankYouPage from './components/ThankYouPage'; // ✅ Import the thank you page
 
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -35,6 +36,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/thank-you" element={<ThankYouPage />} /> {/* ✅ Added route */}
       </Routes>
     </Router>
   );
