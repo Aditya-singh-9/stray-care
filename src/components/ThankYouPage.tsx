@@ -17,7 +17,7 @@ const ThankYouPage = () => {
         Thank You, {name || 'Donor'}! 💚
       </h1>
       <p className="text-lg sm:text-xl text-gray-800 mb-2">
-        Your donation of <span className="font-semibold text-green-600">₹{amount}</span> was successful.
+        Your donation of <span className="font-semibold text-green-600">INR {amount}</span> was successful.
       </p>
       <p className="text-sm text-gray-600 mb-6">
         Payment ID: <span className="font-mono">{paymentId}</span>
