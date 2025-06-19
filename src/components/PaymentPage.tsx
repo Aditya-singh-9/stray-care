@@ -141,25 +141,16 @@ const PaymentPage = () => {
   ];
 
   const memoryImages = [
-    { src: PersonalImage1, title: "Emergency Rescue Operation", subtitle: "Life-saving mission in Mumbai streets", type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage2, title: "Medical Treatment Success", subtitle: "Complex surgery saves Bruno's life", type: "photo", location: "Delhi Veterinary Hospital" },
-    { src: PersonalImage3, title: "Happy Adoption Day", subtitle: "Max finds his forever family", type: "video", location: "Bangalore Adoption Center" },
-    { src: PersonalImage4, title: "Community Awareness Drive", subtitle: "Educating local communities", type: "photo", location: "Pune Community Center" },
-    { src: PersonalImage1, title: "Daily Feeding Program", subtitle: "Nutritious meals for street animals", type: "photo", location: "Kolkata Feeding Station" },
-    { src: PersonalImage2, title: "Vaccination Campaign", subtitle: "Preventive healthcare initiative", type: "photo", location: "Chennai Mobile Clinic" },
-    { src: PersonalImage3, title: "Volunteer Training Session", subtitle: "Building our rescue team", type: "video", location: "Training Center" },
-    { src: PersonalImage4, title: "Rehabilitation Success", subtitle: "From injury to full recovery", type: "photo", location: "Recovery Facility" },
-    { src: PersonalImage1, title: "Sterilization Drive", subtitle: "Population control program", type: "photo", location: "Mobile Clinic" },
-    { src: PersonalImage2, title: "Emergency Night Rescue", subtitle: "24/7 rescue operations", type: "video", location: "Highway Rescue" },
-  ];
-
-  const impactItems = [
-    { amount: "₹100", impact: "Feeds 5 street dogs nutritious meals", icon: Heart, color: "text-amber-600", bg: "bg-amber-50" },
-    { amount: "₹500", impact: "Complete vaccination & health checkup", icon: Shield, color: "text-blue-600", bg: "bg-blue-50" },
-    { amount: "₹1000", impact: "Emergency rescue & first aid treatment", icon: TrendingUp, color: "text-amber-600", bg: "bg-amber-50" },
-    { amount: "₹2500", impact: "Life-saving surgical procedures", icon: Award, color: "text-blue-600", bg: "bg-blue-50" },
-    { amount: "₹5000", impact: "Complete rehabilitation program", icon: Heart, color: "text-amber-600", bg: "bg-amber-50" },
-    { amount: "₹10000", impact: "Mobile clinic operations for a week", icon: Globe, color: "text-blue-600", bg: "bg-blue-50" },
+    { src: PersonalImage1, type: "photo", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage2, type: "photo", location: "Delhi Veterinary Hospital" },
+    { src: PersonalImage3, type: "video", location: "Bangalore Adoption Center" },
+    { src: PersonalImage4, type: "photo", location: "Pune Community Center" },
+    { src: PersonalImage1, type: "photo", location: "Kolkata Feeding Station" },
+    { src: PersonalImage2, type: "photo", location: "Chennai Mobile Clinic" },
+    { src: PersonalImage3, type: "video", location: "Training Center" },
+    { src: PersonalImage4, type: "photo", location: "Recovery Facility" },
+    { src: PersonalImage1, type: "photo", location: "Mobile Clinic" },
+    { src: PersonalImage2, type: "video", location: "Highway Rescue" },
   ];
 
   const testimonials = [
@@ -183,9 +174,6 @@ const PaymentPage = () => {
           <div className="flex items-center gap-4">
             <div className="relative">
               <img src={Logo} alt="Logo" className="h-16 w-16 rounded-full border-3 border-amber-400 shadow-lg" />
-              <div className="absolute -bottom-1 -right-1 bg-blue-600 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center">
-                <Heart className="h-3 w-3 text-white" />
-              </div>
             </div>
             <div>
               <h1 className="font-bold text-2xl bg-gradient-to-r from-blue-600 to-amber-600 bg-clip-text text-transparent">GullyStrayCare</h1>
@@ -205,8 +193,8 @@ const PaymentPage = () => {
 
       {/* MAIN CONTENT */}
       <div className="flex min-h-screen">
-        {/* LEFT SIDE - Payment & Impact (70%) */}
-        <div className="w-full lg:w-[70%] p-6 lg:p-8 overflow-y-auto">
+        {/* LEFT SIDE - Payment (Full width on mobile, 70% on desktop) */}
+        <div className="w-full xl:w-[70%] p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-4xl mx-auto space-y-8">
             
             {/* Hero Section */}
@@ -362,7 +350,7 @@ const PaymentPage = () => {
               {/* Payment Button */}
               <button
                 onClick={handlePayment}
-                className="w-full bg-gradient-to-r from-blue-600 via-blue-700 to-amber-600 hover:from-blue-700 hover:via-blue-800 hover:to-amber-700 text-white py-6 rounded-2xl font-bold text-xl flex justify-center items-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]"
+                className="w-full bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 hover:from-orange-600 hover:via-orange-700 hover:to-orange-800 text-white py-6 rounded-2xl font-bold text-xl flex justify-center items-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]"
               >
                 <Lock className="h-7 w-7 mr-4" /> 
                 Donate ₹{customAmount || selectedAmount} Securely
@@ -372,29 +360,6 @@ const PaymentPage = () => {
               <div className="mt-6 flex justify-center items-center text-gray-600">
                 <Shield className="h-6 w-6 mr-3 text-green-500" />
                 <span className="font-semibold">256-bit SSL Encrypted • PCI DSS Compliant • Trusted by 15,000+ donors</span>
-              </div>
-            </div>
-
-            {/* Impact Grid */}
-            <div className="bg-white rounded-3xl shadow-2xl p-8 border-2 border-amber-200">
-              <h3 className="text-3xl font-bold text-gray-900 mb-8 flex items-center">
-                <Award className="h-8 w-8 mr-4 text-amber-600" />
-                Your Donation Impact
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {impactItems.map((item, index) => (
-                  <div key={index} className={`flex items-center p-6 ${item.bg} rounded-2xl hover:shadow-lg transition-all duration-300 border-2 border-amber-200`}>
-                    <div className="flex-shrink-0 mr-6">
-                      <div className={`w-16 h-16 rounded-2xl bg-white flex items-center justify-center shadow-lg border-2 border-amber-300`}>
-                        <item.icon className={`h-8 w-8 ${item.color}`} />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-bold text-2xl text-gray-900 mb-1">{item.amount}</div>
-                      <div className="text-gray-700 font-medium">{item.impact}</div>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
 
@@ -471,8 +436,8 @@ const PaymentPage = () => {
           </div>
         </div>
 
-        {/* RIGHT SIDE - Memories Gallery (30%) */}
-        <div className="hidden lg:block w-[30%] bg-gradient-to-b from-blue-900 via-blue-800 to-amber-900 relative overflow-hidden">
+        {/* RIGHT SIDE - Memories Gallery (Only visible on XL screens and above) */}
+        <div className="hidden xl:block w-[30%] bg-gradient-to-b from-blue-900 via-blue-800 to-amber-900 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40"></div>
           
           {/* Header */}
@@ -499,10 +464,10 @@ const PaymentPage = () => {
                   <div className="aspect-[4/3] relative">
                     <img 
                       src={memory.src} 
-                      alt={memory.title}
+                      alt={`Memory ${index + 1}`}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                     
                     {/* Play button for videos */}
                     {memory.type === 'video' && (
@@ -513,15 +478,13 @@ const PaymentPage = () => {
                       </div>
                     )}
                     
-                    {/* Content overlay */}
+                    {/* Location overlay */}
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                       <div className="mb-3">
                         <span className="bg-amber-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
                           {memory.type}
                         </span>
                       </div>
-                      <h4 className="text-xl font-bold mb-2">{memory.title}</h4>
-                      <p className="text-blue-200 opacity-90 mb-3 leading-relaxed">{memory.subtitle}</p>
                       
                       {/* Location */}
                       <div className="flex items-center text-amber-300 text-sm">
