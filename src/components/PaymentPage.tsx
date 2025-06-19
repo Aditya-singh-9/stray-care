@@ -17,7 +17,7 @@ declare global {
 const PaymentPage = () => {
   const navigate = useNavigate();
 
-  const predefinedAmounts = [100, 500, 1000, 2500, 5000, 10000];
+  const predefinedAmounts = [25, 50, 100, 200, 500, 1000];
 
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
@@ -318,12 +318,12 @@ const PaymentPage = () => {
                     >
                       <div className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">₹{amt}</div>
                       <div className="text-xs sm:text-sm text-gray-600">
-                        {amt === 100 && "Feeds 5 dogs"}
-                        {amt === 500 && "Medical care"}
-                        {amt === 1000 && "Emergency rescue"}
-                        {amt === 2500 && "Surgery fund"}
-                        {amt === 5000 && "Rehabilitation"}
-                        {amt === 10000 && "Mobile clinic"}
+                        {amt === 25 && "Feeds 5 dogs"}
+                        {amt === 50 && "Medical care"}
+                        {amt === 100 && "Emergency rescue"}
+                        {amt === 200 && "Surgery fund"}
+                        {amt === 500 && "Rehabilitation"}
+                        {amt === 1000 && "Mobile clinic"}
                       </div>
                       {selectedAmount === amt && !customAmount && (
                         <CheckCircle className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 h-6 w-6 sm:h-8 sm:w-8 text-blue-500 bg-white rounded-full shadow-lg" />
