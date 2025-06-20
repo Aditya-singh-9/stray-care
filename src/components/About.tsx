@@ -22,19 +22,10 @@ const About: React.FC = () => {
             <h3 className="text-2xl font-bold text-gray-900 mb-6"></h3>
             <p className="text-gray-600 mb-6 leading-relaxed">
               Gully Stray Care, an initiative by Gully Classes Foundation, was launched during the COVID-19 pandemic to support stray animals severely impacted by the lockdown. With streets deserted and resources cut off, countless animals were left hungry and injured. Our dedicated volunteers stepped in to provide food, clean water, and essential medical care — often in collaboration with compassionate local veterinarians.
-
             </p>
             <p className="text-gray-600 leading-relaxed">
-              Even today, our mission continues. We are committed to raising awareness and guiding people over phone calls from 9:00 AM to 9:00 PM on how to care for stray animals. Whether it’s connecting you to local NGOs, animal welfare groups, or community resources — we ensure that no call for help goes unheard.
+              Even today, our mission continues. We are committed to raising awareness and guiding people over phone calls from 9:00 AM to 9:00 PM on how to care for stray animals. Whether it's connecting you to local NGOs, animal welfare groups, or community resources — we ensure that no call for help goes unheard.
             </p>
-<button
-  onClick={() => window.location.href = 'https://www.gcfindia.in/'}
-  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-300 ease-in-out"
->
-  Gully Classes Foundation
-</button>
-
-
           </div>
           <div className="relative">
             <img 

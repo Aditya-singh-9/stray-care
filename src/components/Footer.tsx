@@ -1,8 +1,11 @@
 import React from 'react';
 import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Logpy from '../assets/images/logo-1.jpg';
 
 const Footer: React.FC = () => {
+  const navigate = useNavigate();
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -12,6 +15,14 @@ const Footer: React.FC = () => {
 
   const openPaymentPage = () => {
     window.open('/payment', '_blank');
+  };
+
+  const handlePrivacyPolicy = () => {
+    navigate('/privacy-policy');
+  };
+
+  const handleTermsOfService = () => {
+    navigate('/terms-of-service');
   };
 
   return (
@@ -111,12 +122,18 @@ const Footer: React.FC = () => {
               © 2024 GullyStray Care. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-amber-400 text-sm transition-colors">
+              <button 
+                onClick={handlePrivacyPolicy}
+                className="text-gray-400 hover:text-amber-400 text-sm transition-colors"
+              >
                 Privacy Policy
-              </a>
-              <a href="#" className="text-gray-400 hover:text-amber-400 text-sm transition-colors">
+              </button>
+              <button 
+                onClick={handleTermsOfService}
+                className="text-gray-400 hover:text-amber-400 text-sm transition-colors"
+              >
                 Terms of Service
-              </a>
+              </button>
               <a href="#" className="text-gray-400 hover:text-amber-400 text-sm transition-colors">
                 80G Certificate
               </a>
