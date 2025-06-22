@@ -25,6 +25,11 @@ const Footer: React.FC = () => {
     navigate('/terms-of-service');
   };
 
+  const openCertificates = () => {
+    window.open('/certificates/80G Gully Classes Foundation.pdf', '_blank');
+    window.open('/certificates/12A Gully Classes Foundation.pdf', '_blank');
+  };
+
   return (
     <footer className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -121,9 +126,12 @@ const Footer: React.FC = () => {
               >
                 Terms of Service
               </button>
-              <a href="#" className="text-gray-400 hover:text-amber-400 text-sm transition-colors">
+              <button 
+                onClick={openCertificates}
+                className="text-gray-400 hover:text-amber-400 text-sm transition-colors"
+              >
                 80G Certificate
-              </a>
+              </button>
             </div>
           </div>
         </div>
