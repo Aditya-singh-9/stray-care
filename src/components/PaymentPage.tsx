@@ -143,15 +143,15 @@ const PaymentPage = () => {
 
   const memoryImages = [
     { src: PersonalImage1, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage2, type: "photo", location: "Delhi Veterinary Hospital" },
-    { src: PersonalImage3, type: "video", location: "Bangalore Adoption Center" },
-    { src: PersonalImage4, type: "photo", location: "Pune Community Center" },
-    { src: PersonalImage1, type: "photo", location: "Kolkata Feeding Station" },
-    { src: PersonalImage2, type: "photo", location: "Chennai Mobile Clinic" },
-    { src: PersonalImage3, type: "video", location: "Training Center" },
-    { src: PersonalImage4, type: "photo", location: "Recovery Facility" },
-    { src: PersonalImage1, type: "photo", location: "Mobile Clinic" },
-    { src: PersonalImage2, type: "video", location: "Highway Rescue" },
+    { src: PersonalImage2, type: "photo", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage3, type: "video", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage4, type: "photo", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage1, type: "photo", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage2, type: "photo", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage3, type: "video", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage4, type: "photo", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage1, type: "photo", location: "Mumbai, Maharashtra" },
+    { src: PersonalImage2, type: "video", location: "Mumbai, Maharashtra" },
   ];
 
   const testimonials = [
