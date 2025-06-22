@@ -48,13 +48,10 @@ const Footer: React.FC = () => {
             </p>
 
             <div className="flex space-x-4">
-              <a href="#" className="bg-gray-800 p-3 rounded-full hover:bg-amber-500 transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="bg-gray-800 p-3 rounded-full hover:bg-amber-500 transition-colors">
+              <a href="https://x.com/gullystraycare" className="bg-gray-800 p-3 rounded-full hover:bg-amber-500 transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="bg-gray-800 p-3 rounded-full hover:bg-amber-500 transition-colors">
+              <a href="https://www.instagram.com/gullystraycare/" className="bg-gray-800 p-3 rounded-full hover:bg-amber-500 transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
@@ -78,16 +75,6 @@ const Footer: React.FC = () => {
                 <button onClick={openPaymentPage} className="text-gray-300 hover:text-amber-400 transition-colors">
                   Donate
                 </button>
-              </li>
-              <li>
-                <a href="#" className="text-gray-300 hover:text-amber-400 transition-colors">
-                  Volunteer
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-300 hover:text-amber-400 transition-colors">
-                  Adopt
-                </a>
               </li>
             </ul>
           </div>
