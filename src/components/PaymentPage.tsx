@@ -86,7 +86,7 @@ const PaymentPage = () => {
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
 
     const options = {
-      key: 'rzp_live_9ZPuTwlbYq5GZo',
+      key: 'rzp_live_CVLoRP0AMxJhjw',
       amount: amount * 100,
       currency: 'INR',
       name: 'GullyStray Care',
