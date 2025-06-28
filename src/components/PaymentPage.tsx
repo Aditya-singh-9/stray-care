@@ -29,6 +29,7 @@ const PaymentPage = () => {
   const [address, setAddress] = useState('');
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // ✅ Load Razorpay script safely
   useEffect(() => {
@@ -75,7 +76,8 @@ const PaymentPage = () => {
     return true;
   };
 
-  const handlePayment = () => {
+  // ✅ Create Razorpay Order and handle payment
+  const handlePayment = async () => {
     if (!scriptLoaded || !window.Razorpay) {
       alert('Payment gateway not loaded yet. Please try again in a moment.');
       return;
@@ -83,55 +85,163 @@ const PaymentPage = () => {
 
     if (!validateFields()) return;
 
+    setIsProcessing(true);
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
 
-    const options = {
-      key: 'rzp_live_CVLoRP0AMxJhjw',
-      amount: amount * 100,
-      currency: 'INR',
-      name: 'GullyStray Care',
-      description: 'Thank you for your contribution',
-      image: Logo,
-      handler: function (response: any) {
-        navigate('/thank-you', {
-          state: {
-            name: donorInfo.name,
-            amount: amount,
-            paymentId: response.razorpay_payment_id,
+    try {
+      // Create order on Razorpay (this should be done via your backend in production)
+      const orderData = {
+        amount: amount * 100, // Amount in paise
+        currency: 'INR',
+        receipt: `receipt_${Date.now()}`,
+        notes: {
+          donation_purpose: 'Animal Rescue',
+          donor_name: donorInfo.name,
+          donor_email: donorInfo.email,
+          donor_phone: donorInfo.phone,
+          tax_exemption: taxExemption,
+          pan: pan || '',
+          aadhaar: aadhaar || '',
+          address: address || ''
+        }
+      };
+
+      // In production, you should create the order via your backend
+      // For now, we'll use the direct payment method with proper configuration
+      const options = {
+        key: 'rzp_live_CVLoRP0AMxJhjw',
+        amount: amount * 100,
+        currency: 'INR',
+        name: 'GullyStray Care',
+        description: 'Donation for Animal Welfare',
+        image: Logo,
+        
+        // ✅ Add order creation callback
+        order_id: undefined, // Will be set if you implement backend order creation
+        
+        handler: function (response: any) {
+          console.log('Payment Success:', response);
+          
+          // ✅ Send payment details to your backend for verification
+          // In production, verify the payment signature on your backend
+          
+          navigate('/thank-you', {
+            state: {
+              name: donorInfo.name,
+              amount: amount,
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id || 'N/A',
+              signature: response.razorpay_signature || 'N/A'
+            },
+          });
+        },
+        
+        prefill: {
+          name: donorInfo.name,
+          email: donorInfo.email,
+          contact: donorInfo.phone,
+        },
+        
+        notes: orderData.notes,
+        
+        theme: { 
+          color: '#F37254' 
+        },
+        
+        method: {
+          netbanking: true,
+          card: true,
+          upi: true,
+          wallet: true,
+        },
+        
+        // ✅ Enhanced payment configuration
+        config: {
+          display: {
+            blocks: {
+              banks: {
+                name: 'Pay using Net Banking',
+                instruments: [
+                  {
+                    method: 'netbanking',
+                    banks: ['HDFC', 'ICICI', 'SBI', 'AXIS', 'YES', 'KOTAK']
+                  }
+                ]
+              },
+              other: {
+                name: 'Other Payment Methods',
+                instruments: [
+                  { method: 'card' },
+                  { method: 'upi' },
+                  { method: 'wallet' }
+                ]
+              }
+            },
+            sequence: ['block.banks', 'block.other'],
+            preferences: {
+              show_default_blocks: true
+            }
+          }
+        },
+        
+        modal: {
+          escape: true,
+          confirm_close: true,
+          ondismiss: () => {
+            setIsProcessing(false);
+            console.log('Payment cancelled by user');
           },
+        },
+        
+        // ✅ Add retry configuration
+        retry: {
+          enabled: true,
+          max_count: 3
+        },
+        
+        // ✅ Add timeout configuration
+        timeout: 300, // 5 minutes
+        
+        // ✅ Add remember customer option
+        remember_customer: false
+      };
+
+      const rzp = new window.Razorpay(options);
+      
+      // ✅ Enhanced error handling
+      rzp.on('payment.failed', function (response: any) {
+        console.error('Payment Failed:', response.error);
+        setIsProcessing(false);
+        
+        let errorMessage = 'Payment failed. Please try again.';
+        
+        if (response.error.code === 'BAD_REQUEST_ERROR') {
+          errorMessage = 'Invalid payment details. Please check and try again.';
+        } else if (response.error.code === 'GATEWAY_ERROR') {
+          errorMessage = 'Payment gateway error. Please try a different payment method.';
+        } else if (response.error.code === 'NETWORK_ERROR') {
+          errorMessage = 'Network error. Please check your connection and try again.';
+        }
+        
+        setError(errorMessage);
+        
+        // Optional: Log error for debugging
+        console.log('Payment Error Details:', {
+          code: response.error.code,
+          description: response.error.description,
+          source: response.error.source,
+          step: response.error.step,
+          reason: response.error.reason
         });
-      },
-      prefill: {
-        name: donorInfo.name,
-        email: donorInfo.email,
-        contact: donorInfo.phone,
-      },
-      notes: {
-        donation_purpose: 'Animal Rescue',
-        pan,
-        aadhaar,
-        address,
-      },
-      theme: { color: '#F37254' },
-      method: {
-        netbanking: true,
-        card: true,
-        upi: true,
-        wallet: true,
-      },
-      modal: {
-        escape: true,
-        ondismiss: () => alert('Payment was cancelled.'),
-      },
-    };
+      });
 
-    const rzp = new window.Razorpay(options);
-    rzp.on('payment.failed', function (response: any) {
-      console.error('Payment Failed:', response.error);
-      alert('Payment failed. Please try again.');
-    });
-
-    rzp.open();
+      rzp.open();
+      
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      setError('Failed to initiate payment. Please try again.');
+      setIsProcessing(false);
+    }
   };
 
   const impactStats = [
@@ -416,11 +526,25 @@ const PaymentPage = () => {
               {/* Payment Button */}
               <button
                 onClick={handlePayment}
-                className="w-full bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 hover:from-orange-600 hover:via-orange-700 hover:to-orange-800 text-white py-4 sm:py-6 rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl flex justify-center items-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02]"
+                disabled={isProcessing}
+                className={`w-full py-4 sm:py-6 rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl flex justify-center items-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02] ${
+                  isProcessing 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 hover:from-orange-600 hover:via-orange-700 hover:to-orange-800 text-white'
+                }`}
               >
-                <Lock className="h-5 w-5 sm:h-7 sm:w-7 mr-3 sm:mr-4" /> 
-                Donate ₹{customAmount || selectedAmount} Securely
-                <ArrowRight className="h-5 w-5 sm:h-7 sm:w-7 ml-3 sm:ml-4" />
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 sm:h-7 sm:w-7 border-b-2 border-white mr-3 sm:mr-4"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-5 w-5 sm:h-7 sm:w-7 mr-3 sm:mr-4" /> 
+                    Donate ₹{customAmount || selectedAmount} Securely
+                    <ArrowRight className="h-5 w-5 sm:h-7 sm:w-7 ml-3 sm:ml-4" />
+                  </>
+                )}
               </button>
 
               <div className="mt-4 sm:mt-6 flex justify-center items-center text-gray-600 text-sm sm:text-base">
