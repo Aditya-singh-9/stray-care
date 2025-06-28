@@ -3,7 +3,7 @@ import { CheckCircle, Download, Share2, Heart, Home } from 'lucide-react';
 
 const ThankYouPage = () => {
   const location = useLocation();
-  const { name, amount, paymentId, orderId, signature } = location.state || {};
+  const { name, amount, paymentId } = location.state || {};
 
   const handleDownloadReceipt = () => {
     // In production, this would generate and download a proper receipt
@@ -11,7 +11,6 @@ const ThankYouPage = () => {
       donorName: name,
       amount: amount,
       paymentId: paymentId,
-      orderId: orderId,
       date: new Date().toLocaleDateString(),
       organization: 'GullyStrayCare'
     };
@@ -59,9 +58,6 @@ const ThankYouPage = () => {
           {/* Payment Details */}
           <div className="mt-6 space-y-2 text-sm text-gray-600">
             <p><span className="font-semibold">Payment ID:</span> <span className="font-mono bg-gray-100 px-2 py-1 rounded">{paymentId}</span></p>
-            {orderId && orderId !== 'N/A' && (
-              <p><span className="font-semibold">Order ID:</span> <span className="font-mono bg-gray-100 px-2 py-1 rounded">{orderId}</span></p>
-            )}
             <p><span className="font-semibold">Date:</span> {new Date().toLocaleDateString()}</p>
           </div>
         </div>
