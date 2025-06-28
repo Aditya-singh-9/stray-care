@@ -76,54 +76,8 @@ const PaymentPage = () => {
     return true;
   };
 
-  // ✅ CREATE RAZORPAY ORDER FUNCTION - This is the key fix!
-  const createRazorpayOrder = async (amount: number) => {
-    try {
-      // ✅ Create order using Razorpay Orders API
-      const orderData = {
-        amount: amount * 100, // Amount in paise
-        currency: 'INR',
-        receipt: `receipt_${Date.now()}`,
-        payment_capture: 1, // ✅ This enables auto-capture!
-        notes: {
-          donation_purpose: 'Animal Rescue',
-          donor_name: donorInfo.name,
-          donor_email: donorInfo.email,
-          donor_phone: donorInfo.phone,
-          tax_exemption: taxExemption.toString(),
-          pan: pan || '',
-          aadhaar: aadhaar || '',
-          address: address || ''
-        }
-      };
-
-      // ✅ For now, we'll simulate the order creation
-      // In production, this should be done via your backend
-      const simulatedOrder = {
-        id: `order_${Date.now()}${Math.random().toString(36).substr(2, 9)}`,
-        entity: 'order',
-        amount: orderData.amount,
-        amount_paid: 0,
-        amount_due: orderData.amount,
-        currency: orderData.currency,
-        receipt: orderData.receipt,
-        status: 'created',
-        attempts: 0,
-        notes: orderData.notes,
-        created_at: Math.floor(Date.now() / 1000)
-      };
-
-      console.log('✅ Order created:', simulatedOrder);
-      return simulatedOrder;
-
-    } catch (error) {
-      console.error('❌ Error creating order:', error);
-      throw new Error('Failed to create payment order');
-    }
-  };
-
-  // ✅ MAIN PAYMENT HANDLER WITH ORDERS API
-  const handlePayment = async () => {
+  // ✅ SIMPLIFIED PAYMENT HANDLER - No Orders API Required
+  const handlePayment = () => {
     if (!scriptLoaded || !window.Razorpay) {
       alert('Payment gateway not loaded yet. Please try again in a moment.');
       return;
@@ -134,186 +88,161 @@ const PaymentPage = () => {
     setIsProcessing(true);
     setError(null);
 
-    try {
-      const amount = customAmount ? parseInt(customAmount) : selectedAmount;
-      
-      // ✅ Step 1: Create Razorpay Order
-      console.log('🔄 Creating Razorpay order...');
-      const order = await createRazorpayOrder(amount);
-      
-      // ✅ Step 2: Configure Razorpay Checkout with ORDER ID
-      const options = {
-        key: 'rzp_live_CVLoRP0AMxJhjw', // Your Razorpay Key ID
-        
-        // ✅ CRITICAL: Pass the order_id from Orders API
-        order_id: order.id, // This is what prevents refunds!
-        
-        amount: order.amount,
-        currency: order.currency,
-        name: 'GullyStray Care',
-        description: 'Donation for Animal Welfare - Thank you for your kindness!',
-        image: Logo,
-        
-        // ✅ Success handler
-        handler: function (response: any) {
-          console.log('✅ Payment Success:', response);
-          
-          // ✅ Payment successful - navigate to thank you page
-          setIsProcessing(false);
-          navigate('/thank-you', {
-            state: {
-              name: donorInfo.name,
-              amount: amount,
-              paymentId: response.razorpay_payment_id,
-              orderId: response.razorpay_order_id,
-              signature: response.razorpay_signature
-            },
-          });
-        },
-        
-        // ✅ Prefill customer details
-        prefill: {
-          name: donorInfo.name,
-          email: donorInfo.email,
-          contact: donorInfo.phone,
-        },
-        
-        // ✅ Add notes for tracking
-        notes: order.notes,
-        
-        // ✅ Theme customization
-        theme: { 
-          color: '#F37254',
-          backdrop_color: 'rgba(0,0,0,0.5)'
-        },
-        
-        // ✅ Payment methods configuration
-        method: {
-          netbanking: true,
-          card: true,
-          upi: true,
-          wallet: true,
-          emi: false,
-          paylater: false
-        },
-        
-        // ✅ Enhanced payment configuration
-        config: {
-          display: {
-            blocks: {
-              utib: { // Axis Bank
-                name: 'Pay using Axis Bank',
-                instruments: [
-                  { method: 'netbanking', banks: ['UTIB'] },
-                ]
-              },
-              other: {
-                name: 'Other Payment Methods',
-                instruments: [
-                  { method: 'card' },
-                  { method: 'upi' },
-                  { method: 'netbanking', banks: ['HDFC', 'ICICI', 'SBI', 'YES', 'KOTAK'] },
-                  { method: 'wallet' }
-                ]
-              }
-            },
-            sequence: ['block.utib', 'block.other'],
-            preferences: {
-              show_default_blocks: true
-            }
-          }
-        },
-        
-        // ✅ Modal configuration
-        modal: {
-          escape: true,
-          confirm_close: true,
-          ondismiss: () => {
-            console.log('❌ Payment cancelled by user');
-            setIsProcessing(false);
-          },
-          animation: true,
-          backdrop_close: false
-        },
-        
-        // ✅ Retry configuration
-        retry: {
-          enabled: true,
-          max_count: 3
-        },
-        
-        // ✅ Timeout configuration (5 minutes)
-        timeout: 300,
-        
-        // ✅ Remember customer preference
-        remember_customer: false,
-        
-        // ✅ Send SMS/Email notifications
-        send_sms_hash: true,
-        allow_rotation: true,
-        
-        // ✅ Readonly contact details
-        readonly: {
-          email: false,
-          contact: false,
-          name: false
-        }
-      };
+    const amount = customAmount ? parseInt(customAmount) : selectedAmount;
+    
+    // ✅ Generate a unique receipt ID for tracking
+    const receiptId = `receipt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    console.log('🚀 Initiating payment for amount:', amount);
 
-      // ✅ Step 3: Initialize Razorpay with enhanced error handling
-      const rzp = new window.Razorpay(options);
+    // ✅ Direct Razorpay Checkout Configuration (No Orders API)
+    const options = {
+      key: 'rzp_live_CVLoRP0AMxJhjw', // Your Razorpay Key ID
       
-      // ✅ Payment failure handler
-      rzp.on('payment.failed', function (response: any) {
-        console.error('❌ Payment Failed:', response.error);
+      // ✅ Direct amount (this will work without Orders API)
+      amount: amount * 100, // Amount in paise
+      currency: 'INR',
+      
+      name: 'GullyStray Care',
+      description: 'Donation for Animal Welfare - Thank you for your kindness!',
+      image: Logo,
+      
+      // ✅ Success handler
+      handler: function (response: any) {
+        console.log('✅ Payment Success:', response);
+        
+        // ✅ Payment successful - navigate to thank you page
         setIsProcessing(false);
-        
-        let errorMessage = 'Payment failed. Please try again.';
-        
-        // ✅ Specific error messages
-        switch (response.error.code) {
-          case 'BAD_REQUEST_ERROR':
-            errorMessage = 'Invalid payment details. Please check your information and try again.';
-            break;
-          case 'GATEWAY_ERROR':
-            errorMessage = 'Payment gateway error. Please try a different payment method.';
-            break;
-          case 'NETWORK_ERROR':
-            errorMessage = 'Network error. Please check your internet connection and try again.';
-            break;
-          case 'SERVER_ERROR':
-            errorMessage = 'Server error. Please try again in a few minutes.';
-            break;
-          case 'VALIDATION_ERROR':
-            errorMessage = 'Validation error. Please check your payment details.';
-            break;
-          default:
-            errorMessage = `Payment failed: ${response.error.description || 'Unknown error'}`;
-        }
-        
-        setError(errorMessage);
-        
-        // ✅ Detailed error logging
-        console.log('💥 Payment Error Details:', {
-          code: response.error.code,
-          description: response.error.description,
-          source: response.error.source,
-          step: response.error.step,
-          reason: response.error.reason,
-          order_id: order.id,
-          payment_id: response.error.metadata?.payment_id
+        navigate('/thank-you', {
+          state: {
+            name: donorInfo.name,
+            amount: amount,
+            paymentId: response.razorpay_payment_id,
+            receiptId: receiptId,
+            timestamp: new Date().toISOString()
+          },
         });
-      });
-
-      // ✅ Step 4: Open Razorpay Checkout
-      console.log('🚀 Opening Razorpay checkout with order:', order.id);
-      rzp.open();
+      },
       
-    } catch (error) {
-      console.error('💥 Error in payment process:', error);
-      setError('Failed to initiate payment. Please try again.');
+      // ✅ Prefill customer details
+      prefill: {
+        name: donorInfo.name,
+        email: donorInfo.email,
+        contact: donorInfo.phone,
+      },
+      
+      // ✅ Add notes for tracking
+      notes: {
+        donation_purpose: 'Animal Rescue',
+        donor_name: donorInfo.name,
+        donor_email: donorInfo.email,
+        donor_phone: donorInfo.phone,
+        tax_exemption: taxExemption.toString(),
+        pan: pan || 'Not provided',
+        aadhaar: aadhaar || 'Not provided',
+        address: address || 'Not provided',
+        receipt_id: receiptId
+      },
+      
+      // ✅ Theme customization
+      theme: { 
+        color: '#F37254',
+        backdrop_color: 'rgba(0,0,0,0.5)'
+      },
+      
+      // ✅ Payment methods configuration
+      method: {
+        netbanking: true,
+        card: true,
+        upi: true,
+        wallet: true,
+        emi: false,
+        paylater: false
+      },
+      
+      // ✅ Modal configuration
+      modal: {
+        escape: true,
+        confirm_close: true,
+        ondismiss: () => {
+          console.log('❌ Payment cancelled by user');
+          setIsProcessing(false);
+        },
+        animation: true,
+        backdrop_close: false
+      },
+      
+      // ✅ Retry configuration
+      retry: {
+        enabled: true,
+        max_count: 3
+      },
+      
+      // ✅ Timeout configuration (5 minutes)
+      timeout: 300,
+      
+      // ✅ Remember customer preference
+      remember_customer: false,
+      
+      // ✅ Send SMS/Email notifications
+      send_sms_hash: true,
+      allow_rotation: true,
+      
+      // ✅ Readonly contact details
+      readonly: {
+        email: false,
+        contact: false,
+        name: false
+      }
+    };
+
+    // ✅ Initialize Razorpay with enhanced error handling
+    const rzp = new window.Razorpay(options);
+    
+    // ✅ Payment failure handler
+    rzp.on('payment.failed', function (response: any) {
+      console.error('❌ Payment Failed:', response.error);
       setIsProcessing(false);
-    }
+      
+      let errorMessage = 'Payment failed. Please try again.';
+      
+      // ✅ Specific error messages
+      switch (response.error.code) {
+        case 'BAD_REQUEST_ERROR':
+          errorMessage = 'Invalid payment details. Please check your information and try again.';
+          break;
+        case 'GATEWAY_ERROR':
+          errorMessage = 'Payment gateway error. Please try a different payment method.';
+          break;
+        case 'NETWORK_ERROR':
+          errorMessage = 'Network error. Please check your internet connection and try again.';
+          break;
+        case 'SERVER_ERROR':
+          errorMessage = 'Server error. Please try again in a few minutes.';
+          break;
+        case 'VALIDATION_ERROR':
+          errorMessage = 'Validation error. Please check your payment details.';
+          break;
+        default:
+          errorMessage = `Payment failed: ${response.error.description || 'Unknown error'}`;
+      }
+      
+      setError(errorMessage);
+      
+      // ✅ Detailed error logging
+      console.log('💥 Payment Error Details:', {
+        code: response.error.code,
+        description: response.error.description,
+        source: response.error.source,
+        step: response.error.step,
+        reason: response.error.reason,
+        payment_id: response.error.metadata?.payment_id
+      });
+    });
+
+    // ✅ Open Razorpay Checkout
+    console.log('🚀 Opening Razorpay checkout...');
+    rzp.open();
   };
 
   const impactStats = [
@@ -521,7 +450,7 @@ const PaymentPage = () => {
                     onChange={(e) => setCustomAmount(e.target.value)}
                     className="w-full p-4 sm:p-6 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-lg sm:text-xl transition-all duration-200 bg-gradient-to-r from-gray-50 to-blue-50"
                   />
-                  <div className="absolute right-4 sm:right-6 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-base sm:text-lg">INR</div>
+                  <div className="absolute right-4 sm:right-6 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-base sm:text-lg">₹</div>
                 </div>
               </div>
 
@@ -608,7 +537,7 @@ const PaymentPage = () => {
                 {isProcessing ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 sm:h-7 sm:w-7 border-b-2 border-white mr-3 sm:mr-4"></div>
-                    Creating Order...
+                    Processing...
                   </>
                 ) : (
                   <>
