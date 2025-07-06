@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Shield, Award, Heart, Users, TrendingUp, MapPin, ArrowRight, CheckCircle, Camera, Play, Phone, Mail, Clock, Globe } from 'lucide-react';
+import { Lock, Shield, Award, Heart, Users, TrendingUp, MapPin, ArrowRight, CheckCircle, Phone, Mail, Clock, Globe, Star, Quote } from 'lucide-react';
 
 import PersonalImage1 from '../assets/images/personal-image1.jpg';
 import PersonalImage2 from '../assets/images/personal-image2.jpg';
@@ -17,7 +17,7 @@ declare global {
 const PaymentPage = () => {
   const navigate = useNavigate();
 
-  const predefinedAmounts = [25, 50, 100, 200, 500, 1000];
+  const predefinedAmounts = [100, 250, 500, 1000, 2500, 5000];
 
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
@@ -28,10 +28,9 @@ const PaymentPage = () => {
   const [aadhaar, setAadhaar] = useState('');
   const [address, setAddress] = useState('');
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const [showGallery, setShowGallery] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // ✅ Load Razorpay script safely
+  // Load Razorpay script
   useEffect(() => {
     const scriptId = 'razorpay-script';
     if (!document.getElementById(scriptId)) {
@@ -76,7 +75,6 @@ const PaymentPage = () => {
     return true;
   };
 
-  // ✅ Create Razorpay Order and handle payment
   const handlePayment = async () => {
     if (!scriptLoaded || !window.Razorpay) {
       alert('Payment gateway not loaded yet. Please try again in a moment.');
@@ -89,25 +87,6 @@ const PaymentPage = () => {
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
 
     try {
-      // Create order on Razorpay (this should be done via your backend in production)
-      const orderData = {
-        amount: amount * 100, // Amount in paise
-        currency: 'INR',
-        receipt: `receipt_${Date.now()}`,
-        notes: {
-          donation_purpose: 'Animal Rescue',
-          donor_name: donorInfo.name,
-          donor_email: donorInfo.email,
-          donor_phone: donorInfo.phone,
-          tax_exemption: taxExemption,
-          pan: pan || '',
-          aadhaar: aadhaar || '',
-          address: address || ''
-        }
-      };
-
-      // In production, you should create the order via your backend
-      // For now, we'll use the direct payment method with proper configuration
       const options = {
         key: 'rzp_live_CVLoRP0AMxJhjw',
         amount: amount * 100,
@@ -116,15 +95,8 @@ const PaymentPage = () => {
         description: 'Donation for Animal Welfare',
         image: Logo,
         
-        // ✅ Add order creation callback
-        order_id: undefined, // Will be set if you implement backend order creation
-        
         handler: function (response: any) {
           console.log('Payment Success:', response);
-          
-          // ✅ Send payment details to your backend for verification
-          // In production, verify the payment signature on your backend
-          
           navigate('/thank-you', {
             state: {
               name: donorInfo.name,
@@ -142,7 +114,16 @@ const PaymentPage = () => {
           contact: donorInfo.phone,
         },
         
-        notes: orderData.notes,
+        notes: {
+          donation_purpose: 'Animal Rescue',
+          donor_name: donorInfo.name,
+          donor_email: donorInfo.email,
+          donor_phone: donorInfo.phone,
+          tax_exemption: taxExemption,
+          pan: pan || '',
+          aadhaar: aadhaar || '',
+          address: address || ''
+        },
         
         theme: { 
           color: '#F37254' 
@@ -155,35 +136,6 @@ const PaymentPage = () => {
           wallet: true,
         },
         
-        // ✅ Enhanced payment configuration
-        config: {
-          display: {
-            blocks: {
-              banks: {
-                name: 'Pay using Net Banking',
-                instruments: [
-                  {
-                    method: 'netbanking',
-                    banks: ['HDFC', 'ICICI', 'SBI', 'AXIS', 'YES', 'KOTAK']
-                  }
-                ]
-              },
-              other: {
-                name: 'Other Payment Methods',
-                instruments: [
-                  { method: 'card' },
-                  { method: 'upi' },
-                  { method: 'wallet' }
-                ]
-              }
-            },
-            sequence: ['block.banks', 'block.other'],
-            preferences: {
-              show_default_blocks: true
-            }
-          }
-        },
-        
         modal: {
           escape: true,
           confirm_close: true,
@@ -193,22 +145,17 @@ const PaymentPage = () => {
           },
         },
         
-        // ✅ Add retry configuration
         retry: {
           enabled: true,
           max_count: 3
         },
         
-        // ✅ Add timeout configuration
-        timeout: 300, // 5 minutes
-        
-        // ✅ Add remember customer option
+        timeout: 300,
         remember_customer: false
       };
 
       const rzp = new window.Razorpay(options);
       
-      // ✅ Enhanced error handling
       rzp.on('payment.failed', function (response: any) {
         console.error('Payment Failed:', response.error);
         setIsProcessing(false);
@@ -224,15 +171,6 @@ const PaymentPage = () => {
         }
         
         setError(errorMessage);
-        
-        // Optional: Log error for debugging
-        console.log('Payment Error Details:', {
-          code: response.error.code,
-          description: response.error.description,
-          source: response.error.source,
-          step: response.error.step,
-          reason: response.error.reason
-        });
       });
 
       rzp.open();
@@ -245,279 +183,289 @@ const PaymentPage = () => {
   };
 
   const impactStats = [
-    { icon: Heart, num: 550, label: 'Animals Rescued', color: 'text-amber-600', bg: 'bg-amber-50' },
+    { icon: Heart, num: 550, label: 'Animals Rescued', color: 'text-red-600', bg: 'bg-red-50' },
     { icon: Users, num: 223, label: 'Successful Adoptions', color: 'text-blue-600', bg: 'bg-blue-50' },
-    { icon: TrendingUp, num: 545, label: 'Sterilizations Done', color: 'text-amber-600', bg: 'bg-amber-50' },
-    { icon: MapPin, num: 12, label: 'Cities Covered', color: 'text-blue-600', bg: 'bg-blue-50' },
-  ];
-
-  const memoryImages = [
-    { src: PersonalImage1, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage2, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage3, type: "video", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage4, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage1, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage2, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage3, type: "video", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage4, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage1, type: "photo", location: "Mumbai, Maharashtra" },
-    { src: PersonalImage2, type: "video", location: "Mumbai, Maharashtra" },
+    { icon: TrendingUp, num: 545, label: 'Sterilizations Done', color: 'text-green-600', bg: 'bg-green-50' },
+    { icon: MapPin, num: 12, label: 'Cities Covered', color: 'text-purple-600', bg: 'bg-purple-50' },
   ];
 
   const testimonials = [
-    { name: "Dr. Priya Sharma", role: "Veterinary Partner", quote: "Working with GullyStrayCare has been incredibly rewarding. Their dedication is unmatched." },
-    { name: "Rajesh Kumar", role: "Monthly Donor", quote: "The transparency and impact reports give me confidence in supporting this cause." },
-    { name: "Meera Singh", role: "Volunteer", quote: "Being part of rescue operations has been the most fulfilling experience of my life." },
-  ];
-
-  const quickFacts = [
-    { label: "Response Time", value: "< 2 Hours", icon: Clock },
-    { label: "Success Rate", value: "94%", icon: TrendingUp },
-    { label: "Volunteer Network", value: "500+", icon: Users },
-    { label: "Partner Clinics", value: "25+", icon: Heart },
+    { 
+      name: "Dr. Priya Sharma", 
+      role: "Veterinary Partner", 
+      quote: "Working with GullyStrayCare has been incredibly rewarding. Their dedication is unmatched.",
+      image: PersonalImage1
+    },
+    { 
+      name: "Rajesh Kumar", 
+      role: "Monthly Donor", 
+      quote: "The transparency and impact reports give me confidence in supporting this cause.",
+      image: PersonalImage2
+    },
+    { 
+      name: "Meera Singh", 
+      role: "Volunteer", 
+      quote: "Being part of rescue operations has been the most fulfilling experience of my life.",
+      image: PersonalImage3
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-amber-50 to-blue-100">
-      {/* HEADER - Always visible */}
-      <header className="bg-white/90 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b-2 border-amber-200">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <div className="relative">
-              <img src={Logo} alt="Logo" className="h-12 w-12 sm:h-16 sm:w-16 rounded-full border-2 sm:border-3 border-amber-400 shadow-lg" />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <img src={Logo} alt="GullyStray Care Logo" className="h-12 w-12 rounded-full shadow-sm" />
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">Gully StrayCare</h1>
+                <p className="text-xs text-blue-600 font-medium">Compassion in Action</p>
+              </div>
             </div>
-            <div>
-              <h1 className="font-bold text-lg sm:text-2xl bg-gradient-to-r from-blue-600 to-amber-600 bg-clip-text text-transparent">GullyStrayCare</h1>
-              <p className="text-xs sm:text-sm text-blue-600 font-semibold">Compassion in Action</p>
-            </div>
+            <button 
+              onClick={() => navigate('/')}
+              className="text-gray-600 hover:text-gray-900 font-medium"
+            >
+              ← Back to Home
+            </button>
           </div>
-          
-          {/* Mobile Gallery Toggle */}
-          <button 
-            onClick={() => setShowGallery(!showGallery)}
-            className="lg:hidden bg-gradient-to-r from-blue-600 to-amber-600 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2"
-          >
-            <Camera className="h-4 w-4" />
-            Gallery
-          </button>
-
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {['Home', 'About', 'Services', 'Impact', 'Contact'].map((item) => (
-              <a key={item} href="/" className="text-gray-700 hover:text-blue-600 font-semibold transition-all duration-200 relative group px-3 py-2">
-                {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-gradient-to-r from-blue-600 to-amber-600 transition-all duration-300 group-hover:w-full rounded-full"></span>
-              </a>
-            ))}
-          </nav>
         </div>
       </header>
 
-      {/* Mobile Gallery Overlay */}
-      {showGallery && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-black/90 overflow-y-auto">
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold text-white flex items-center">
-                <Camera className="h-6 w-6 mr-3 text-amber-400" />
-                Our Journey
-              </h3>
-              <button 
-                onClick={() => setShowGallery(false)}
-                className="text-white bg-white/20 px-4 py-2 rounded-full"
-              >
-                Close
-              </button>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          
+          {/* Left Column - Campaign Info */}
+          <div className="lg:col-span-2 space-y-6">
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {memoryImages.slice(0, 6).map((memory, index) => (
-                <div key={index} className="relative overflow-hidden rounded-2xl">
-                  <div className="aspect-[4/3] relative">
-                    <img 
-                      src={memory.src} 
-                      alt={`Memory ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    
-                    {memory.type === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-amber-500/80 backdrop-blur-sm rounded-full p-4">
-                          <Play className="h-6 w-6 text-white fill-current" />
+            {/* Hero Section */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="relative h-64 sm:h-80">
+                <img 
+                  src={PersonalImage1} 
+                  alt="Animal rescue"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <h1 className="text-2xl sm:text-3xl font-bold mb-2">Help Us Save Street Animals</h1>
+                  <p className="text-lg opacity-90">Every donation helps us rescue, treat, and rehome animals in need</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Campaign Description */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Campaign</h2>
+              <div className="prose prose-gray max-w-none">
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  GullyStrayCare is dedicated to rescuing, rehabilitating, and rehoming street animals across India. 
+                  Since our inception during the COVID-19 pandemic, we have been working tirelessly to provide food, 
+                  medical care, and shelter to animals in need.
+                </p>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  Your donation directly supports our emergency rescue operations, medical treatments, sterilization 
+                  programs, and adoption services. Every contribution, no matter the size, makes a real difference 
+                  in an animal's life.
+                </p>
+                
+                <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                  <h3 className="font-semibold text-blue-900 mb-2">How Your Donation Helps:</h3>
+                  <ul className="text-blue-800 space-y-1">
+                    <li>• ₹100 - Feeds 5 street dogs for a day</li>
+                    <li>• ₹500 - Provides basic medical care and vaccination</li>
+                    <li>• ₹1000 - Covers sterilization surgery for one animal</li>
+                    <li>• ₹2500 - Emergency surgery and rehabilitation</li>
+                    <li>• ₹5000 - Complete rescue and adoption process</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Impact Statistics */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Our Impact So Far</h3>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {impactStats.map((stat, index) => (
+                  <div key={index} className={`${stat.bg} rounded-lg p-4 text-center`}>
+                    <stat.icon className={`h-8 w-8 ${stat.color} mx-auto mb-2`} />
+                    <div className="text-2xl font-bold text-gray-900">{stat.num}+</div>
+                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Testimonials */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">What People Say</h3>
+              <div className="space-y-4">
+                {testimonials.map((testimonial, index) => (
+                  <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                    <div className="flex items-start space-x-3">
+                      <img 
+                        src={testimonial.image} 
+                        alt={testimonial.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div className="flex-1">
+                        <Quote className="h-4 w-4 text-gray-400 mb-1" />
+                        <p className="text-gray-700 italic mb-2">"{testimonial.quote}"</p>
+                        <div>
+                          <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                          <div className="text-sm text-gray-600">{testimonial.role}</div>
                         </div>
-                      </div>
-                    )}
-                    
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <div className="mb-2">
-                        <span className="bg-amber-500 px-2 py-1 rounded-full text-xs font-bold uppercase">
-                          {memory.type}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-amber-300 text-sm">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        <span>{memory.location}</span>
                       </div>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Us</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3">
+                  <Phone className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Emergency Helpline</div>
+                    <div className="text-blue-600">+91 9323263322</div>
+                  </div>
                 </div>
-              ))}
+                <div className="flex items-center space-x-3">
+                  <Mail className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Email Support</div>
+                    <div className="text-blue-600">gullystrayc@gmail.com</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Clock className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Support Hours</div>
+                    <div className="text-gray-600">9:00 AM - 9:00 PM Daily</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Globe className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <div className="font-medium text-gray-900">Coverage</div>
+                    <div className="text-gray-600">12+ Cities Across India</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* MAIN CONTENT */}
-      <div className="flex min-h-screen">
-        {/* LEFT SIDE - Payment Form */}
-        <div className="w-full lg:w-[70%] p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
-            
-            {/* Hero Section */}
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="inline-flex items-center bg-gradient-to-r from-blue-100 to-amber-100 px-4 sm:px-8 py-3 sm:py-4 rounded-full text-blue-800 font-semibold mb-4 sm:mb-6 shadow-md">
-                <Heart className="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3 text-amber-600" />
-                Transform Lives Today
-              </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
-                Support Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-amber-600">Mission</span>
-              </h1>
-              <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
-                Every donation helps us rescue, rehabilitate, and rehome street animals across India. Join thousands of compassionate donors making a real difference.
-              </p>
-            </div>
-
-            {/* Quick Facts Banner */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-              {quickFacts.map((fact, index) => (
-                <div key={index} className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 text-center shadow-md border border-amber-200 hover:shadow-lg transition-all duration-300">
-                  <fact.icon className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-2 text-blue-600" />
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{fact.value}</div>
-                  <div className="text-xs sm:text-sm text-gray-600 font-medium">{fact.label}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Payment Form */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border-2 border-amber-200">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center">
-                <Lock className="h-6 w-6 sm:h-8 sm:w-8 mr-3 sm:mr-4 text-blue-600" />
-                Secure Donation Portal
-              </h2>
+          {/* Right Column - Donation Form */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation</h2>
               
               {error && (
-                <div className="p-4 mb-6 bg-red-50 border-2 border-red-200 text-red-700 rounded-xl flex items-center">
-                  <Shield className="h-5 w-5 mr-3" />
-                  {error}
+                <div className="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center">
+                  <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="text-sm">{error}</span>
                 </div>
               )}
 
               {/* Amount Selection */}
-              <div className="mb-6 sm:mb-8">
-                <label className="block text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Choose Your Impact Amount</label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
+                <div className="grid grid-cols-2 gap-3 mb-4">
                   {predefinedAmounts.map((amt) => (
                     <button
                       key={amt}
                       onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
-                      className={`relative p-4 sm:p-6 rounded-xl sm:rounded-2xl border-2 sm:border-3 font-bold transition-all duration-300 transform hover:scale-105 ${
+                      className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
                         selectedAmount === amt && !customAmount
-                          ? 'border-blue-500 bg-gradient-to-r from-blue-50 to-amber-50 text-blue-700 shadow-xl'
-                          : 'border-amber-200 hover:border-blue-300 hover:shadow-lg bg-gradient-to-r from-gray-50 to-blue-50'
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 hover:border-blue-300 text-gray-700'
                       }`}
                     >
-                      <div className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">₹{amt}</div>
-                      <div className="text-xs sm:text-sm text-gray-600">
-                        {amt === 25 && "Feeds 5 dogs"}
-                        {amt === 50 && "Medical care"}
-                        {amt === 100 && "Emergency rescue"}
-                        {amt === 200 && "Surgery fund"}
-                        {amt === 500 && "Rehabilitation"}
-                        {amt === 1000 && "Mobile clinic"}
-                      </div>
-                      {selectedAmount === amt && !customAmount && (
-                        <CheckCircle className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 h-6 w-6 sm:h-8 sm:w-8 text-blue-500 bg-white rounded-full shadow-lg" />
-                      )}
+                      ₹{amt.toLocaleString()}
                     </button>
                   ))}
                 </div>
-                <div className="relative">
-                  <input
-                    type="number"
-                    placeholder="Enter your custom amount"
-                    value={customAmount}
-                    onChange={(e) => setCustomAmount(e.target.value)}
-                    className="w-full p-4 sm:p-6 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 text-lg sm:text-xl transition-all duration-200 bg-gradient-to-r from-gray-50 to-blue-50"
-                  />
-                  <div className="absolute right-4 sm:right-6 top-1/2 transform -translate-y-1/2 text-gray-500 font-bold text-base sm:text-lg">INR</div>
-                </div>
+                <input
+                  type="number"
+                  placeholder="Enter custom amount"
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
 
               {/* Donor Information */}
-              <div className="mb-6 sm:mb-8">
-                <label className="block text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Your Information</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Your Information</label>
+                <div className="space-y-3">
                   <input
                     type="text"
                     placeholder="Full Name *"
                     value={donorInfo.name}
                     onChange={(e) => setDonorInfo({ ...donorInfo, name: e.target.value })}
-                    className="p-4 sm:p-5 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base sm:text-lg"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
                   />
                   <input
                     type="email"
                     placeholder="Email Address *"
                     value={donorInfo.email}
                     onChange={(e) => setDonorInfo({ ...donorInfo, email: e.target.value })}
-                    className="p-4 sm:p-5 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base sm:text-lg"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number *"
+                    value={donorInfo.phone}
+                    onChange={(e) => setDonorInfo({ ...donorInfo, phone: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
                   />
                 </div>
-                <input
-                  type="tel"
-                  placeholder="Phone Number *"
-                  value={donorInfo.phone}
-                  onChange={(e) => setDonorInfo({ ...donorInfo, phone: e.target.value })}
-                  className="w-full p-4 sm:p-5 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base sm:text-lg"
-                />
               </div>
 
               {/* 80G Tax Exemption */}
-              <div className="mb-6 sm:mb-8 p-4 sm:p-6 lg:p-8 bg-gradient-to-r from-amber-50 to-blue-50 rounded-xl sm:rounded-2xl border-2 border-amber-300">
-                <label className="flex items-start sm:items-center gap-3 sm:gap-4 cursor-pointer">
+              <div className="mb-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                <label className="flex items-start space-x-3 cursor-pointer">
                   <input 
                     type="checkbox" 
                     checked={taxExemption} 
                     onChange={(e) => setTaxExemption(e.target.checked)}
-                    className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 rounded-lg focus:ring-blue-500 mt-1 sm:mt-0"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 mt-0.5"
                   />
                   <div>
-                    <span className="text-lg sm:text-xl font-bold text-gray-900">Claim 80G Tax Exemption</span>
-                    <p className="text-gray-600 mt-1">Save up to 30% on taxes with our 80G certificate</p>
+                    <span className="font-medium text-gray-900">Claim 80G Tax Exemption</span>
+                    <p className="text-sm text-gray-600 mt-1">Get tax benefits up to 50% under Section 80G</p>
                   </div>
                 </label>
                 
                 {taxExemption && (
-                  <div className="mt-6 sm:mt-8 space-y-4 sm:space-y-6 animate-fadeIn">
+                  <div className="mt-4 space-y-3">
                     <input 
                       type="text" 
                       placeholder="PAN Number *" 
                       value={pan} 
                       onChange={(e) => setPan(e.target.value)} 
-                      className="w-full p-4 sm:p-5 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base sm:text-lg" 
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                     />
                     <input 
                       type="text" 
                       placeholder="Aadhaar Number *" 
                       value={aadhaar} 
                       onChange={(e) => setAadhaar(e.target.value)} 
-                      className="w-full p-4 sm:p-5 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 text-base sm:text-lg" 
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                     />
                     <textarea 
-                      rows={4} 
+                      rows={3} 
                       placeholder="Complete Address with Pincode *" 
                       value={address} 
                       onChange={(e) => setAddress(e.target.value)} 
-                      className="w-full p-4 sm:p-5 border-2 sm:border-3 border-amber-200 rounded-xl sm:rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200 resize-none text-base sm:text-lg" 
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" 
                     />
                   </div>
                 )}
@@ -527,185 +475,64 @@ const PaymentPage = () => {
               <button
                 onClick={handlePayment}
                 disabled={isProcessing}
-                className={`w-full py-4 sm:py-6 rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl flex justify-center items-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-[1.02] ${
+                className={`w-full py-4 rounded-lg font-semibold text-lg flex justify-center items-center transition-all duration-300 ${
                   isProcessing 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-orange-500 via-orange-600 to-orange-700 hover:from-orange-600 hover:via-orange-700 hover:to-orange-800 text-white'
+                    ? 'bg-gray-400 cursor-not-allowed text-white' 
+                    : 'bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl'
                 }`}
               >
                 {isProcessing ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 sm:h-7 sm:w-7 border-b-2 border-white mr-3 sm:mr-4"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
                     Processing...
                   </>
                 ) : (
                   <>
-                    <Lock className="h-5 w-5 sm:h-7 sm:w-7 mr-3 sm:mr-4" /> 
-                    Donate ₹{customAmount || selectedAmount} Securely
-                    <ArrowRight className="h-5 w-5 sm:h-7 sm:w-7 ml-3 sm:ml-4" />
+                    <Lock className="h-5 w-5 mr-3" /> 
+                    Donate ₹{(customAmount || selectedAmount).toLocaleString()} Securely
                   </>
                 )}
               </button>
 
-              <div className="mt-4 sm:mt-6 flex justify-center items-center text-gray-600 text-sm sm:text-base">
-                <Shield className="h-5 w-5 sm:h-6 sm:w-6 mr-2 sm:mr-3 text-green-500" />
-                <span className="font-semibold text-center">256-bit SSL Encrypted • PCI DSS Compliant • Trusted by 15,000+ donors</span>
+              {/* Security Info */}
+              <div className="mt-4 flex items-center justify-center text-gray-500 text-sm">
+                <Shield className="h-4 w-4 mr-2 text-green-500" />
+                <span>Secured by Razorpay • SSL Encrypted</span>
               </div>
-            </div>
 
-            {/* Statistics */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {impactStats.map((stat, index) => (
-                <div key={index} className={`${stat.bg} rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 text-center hover:shadow-xl transition-all duration-300 transform hover:scale-105 border-2 border-amber-200`}>
-                  <div className="flex justify-center mb-3 sm:mb-4">
-                    <stat.icon className={`h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 ${stat.color}`} />
-                  </div>
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">{stat.num}+</div>
-                  <div className="text-gray-600 font-semibold text-sm sm:text-base">{stat.label}</div>
+              {/* Tax Benefits Info */}
+              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="flex items-center mb-2">
+                  <Award className="h-5 w-5 text-green-600 mr-2" />
+                  <span className="font-medium text-green-900">Tax Benefits Available</span>
                 </div>
-              ))}
-            </div>
-
-            {/* Testimonials */}
-            <div className="bg-gradient-to-r from-blue-600 to-amber-600 rounded-2xl sm:rounded-3xl p-4 sm:p-6 lg:p-8 text-white">
-              <h3 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">What Our Community Says</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                {testimonials.map((testimonial, index) => (
-                  <div key={index} className="bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 hover:bg-white/30 transition-all duration-300">
-                    <p className="text-white/90 mb-3 sm:mb-4 italic text-sm sm:text-base">"{testimonial.quote}"</p>
-                    <div>
-                      <div className="font-bold text-sm sm:text-base">{testimonial.name}</div>
-                      <div className="text-white/80 text-xs sm:text-sm">{testimonial.role}</div>
-                    </div>
-                  </div>
-                ))}
+                <ul className="text-sm text-green-800 space-y-1">
+                  <li>• 80G Tax Certificate provided</li>
+                  <li>• Save up to 50% on taxes</li>
+                  <li>• Instant receipt via email</li>
+                  <li>• Valid for IT returns</li>
+                </ul>
               </div>
-            </div>
 
-            {/* Contact Information */}
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border-2 border-amber-200">
-              <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 flex items-center">
-                <Phone className="h-6 w-6 sm:h-8 sm:w-8 mr-3 sm:mr-4 text-blue-600" />
-                Need Help? Contact Us
-              </h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="flex items-center">
-                    <Phone className="h-5 w-5 sm:h-6 sm:w-6 mr-3 sm:mr-4 text-amber-600" />
-                    <div>
-                      <div className="font-bold text-gray-900 text-sm sm:text-base">Emergency Helpline</div>
-                      <div className="text-blue-600 font-semibold text-sm sm:text-base">+91 9323263322</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <Mail className="h-5 w-5 sm:h-6 sm:w-6 mr-3 sm:mr-4 text-amber-600" />
-                    <div>
-                      <div className="font-bold text-gray-900 text-sm sm:text-base">Email Support</div>
-                      <div className="text-blue-600 font-semibold text-sm sm:text-base">gullystrayc@gmail.com</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-4 sm:space-y-6">
-                  <div className="flex items-center">
-                    <Clock className="h-5 w-5 sm:h-6 sm:w-6 mr-3 sm:mr-4 text-amber-600" />
-                    <div>
-                      <div className="font-bold text-gray-900 text-sm sm:text-base">Support Hours</div>
-                      <div className="text-gray-600 text-sm sm:text-base">9:00 AM - 9:00 PM Daily</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <Globe className="h-5 w-5 sm:h-6 sm:w-6 mr-3 sm:mr-4 text-amber-600" />
-                    <div>
-                      <div className="font-bold text-gray-900 text-sm sm:text-base">Coverage Area</div>
-                      <div className="text-gray-600 text-sm sm:text-base">12+ Cities Across India</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT SIDE - Memories Gallery (Desktop Only) */}
-        <div className="hidden lg:block w-[30%] bg-gradient-to-b from-blue-900 via-blue-800 to-amber-900 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40"></div>
-          
-          {/* Header */}
-          <div className="relative z-10 p-8 text-white">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-3xl font-bold flex items-center">
-                  <Camera className="h-8 w-8 mr-4 text-amber-400" />
-                  Our Journey
-                </h3>
-                <p className="text-blue-200 mt-2 text-lg">Stories of hope and transformation</p>
-              </div>
-              <button className="text-amber-400 hover:text-amber-300 transition-colors bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm">
-                <span className="font-semibold">View All</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Scrollable Gallery */}
-          <div className="relative z-10 h-full overflow-y-auto pb-32 px-6">
-            <div className="space-y-8">
-              {memoryImages.map((memory, index) => (
-                <div key={index} className="group relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-[1.02]">
-                  <div className="aspect-[4/3] relative">
-                    <img 
-                      src={memory.src} 
-                      alt={`Memory ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    
-                    {/* Play button for videos */}
-                    {memory.type === 'video' && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="bg-amber-500/80 backdrop-blur-sm rounded-full p-6 group-hover:bg-amber-400/90 transition-all duration-300 shadow-2xl">
-                          <Play className="h-10 w-10 text-white fill-current" />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Location overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <div className="mb-3">
-                        <span className="bg-amber-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-                          {memory.type}
-                        </span>
-                      </div>
-                      
-                      {/* Location */}
-                      <div className="flex items-center text-amber-300 text-sm">
-                        <MapPin className="h-4 w-4 mr-2" />
-                        <span>{memory.location}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Load more button */}
-            <div className="mt-12 text-center">
-              <button className="bg-gradient-to-r from-amber-500 to-blue-600 text-white px-8 py-4 rounded-full hover:from-amber-600 hover:to-blue-700 transition-all duration-300 font-bold shadow-xl">
-                Load More Stories
-              </button>
-            </div>
-          </div>
-
-          {/* Floating stats */}
-          <div className="absolute bottom-8 left-6 right-6 z-10">
-            <div className="bg-gradient-to-r from-blue-600/90 to-amber-600/90 backdrop-blur-md rounded-3xl p-6 text-white shadow-2xl border border-white/20">
-              <div className="grid grid-cols-2 gap-4 text-center">
-                <div>
-                  <div className="text-3xl font-bold text-amber-300">2,847</div>
-                  <div className="text-sm text-blue-200">Memories Captured</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-amber-300">24/7</div>
-                  <div className="text-sm text-blue-200">Always Available</div>
+              {/* Quick Impact */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 className="font-medium text-blue-900 mb-2">Your Impact</h4>
+                <div className="text-sm text-blue-800">
+                  {customAmount || selectedAmount >= 5000 && (
+                    <p>• Complete rescue & adoption process for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 2500 && (customAmount || selectedAmount) < 5000 && (
+                    <p>• Emergency surgery & rehabilitation for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
+                    <p>• Sterilization surgery for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
+                    <p>• Medical care & vaccination for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) < 500 && (
+                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 20)} street dogs</p>
+                  )}
                 </div>
               </div>
             </div>
