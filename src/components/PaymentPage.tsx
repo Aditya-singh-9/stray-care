@@ -213,92 +213,20 @@ const PaymentPage = () => {
     },
   ];
 
-  // Gallery images with descriptions
+  // Gallery images - clean without text overlays
   const galleryImages = [
-    {
-      src: PersonalImage1,
-      title: "Emergency Rescue Operation",
-      description: "Our team responding to an emergency call in Mumbai",
-      category: "Rescue",
-      location: "Mumbai, Maharashtra"
-    },
-    {
-      src: PersonalImage2,
-      title: "Medical Treatment",
-      description: "Providing essential medical care to injured animals",
-      category: "Medical",
-      location: "Delhi, NCR"
-    },
-    {
-      src: PersonalImage3,
-      title: "Successful Recovery",
-      description: "A rescued dog recovering after surgery",
-      category: "Recovery",
-      location: "Bangalore, Karnataka"
-    },
-    {
-      src: PersonalImage4,
-      title: "Happy Adoption",
-      description: "A beautiful moment when pets find their forever homes",
-      category: "Adoption",
-      location: "Pune, Maharashtra"
-    },
-    {
-      src: HeroImg,
-      title: "Community Outreach",
-      description: "Educating communities about animal welfare",
-      category: "Education",
-      location: "Chennai, Tamil Nadu"
-    },
-    {
-      src: AboutImg,
-      title: "Volunteer Training",
-      description: "Training volunteers for rescue operations",
-      category: "Training",
-      location: "Hyderabad, Telangana"
-    },
-    {
-      src: ImpactImg,
-      title: "Sterilization Drive",
-      description: "Mass sterilization program to control population",
-      category: "Sterilization",
-      location: "Kolkata, West Bengal"
-    },
-    {
-      src: PersonalImage1,
-      title: "Feeding Program",
-      description: "Daily feeding of street animals in urban areas",
-      category: "Feeding",
-      location: "Ahmedabad, Gujarat"
-    },
-    {
-      src: PersonalImage2,
-      title: "Shelter Care",
-      description: "Providing temporary shelter for rescued animals",
-      category: "Shelter",
-      location: "Jaipur, Rajasthan"
-    },
-    {
-      src: PersonalImage3,
-      title: "Vaccination Drive",
-      description: "Preventive healthcare through vaccination programs",
-      category: "Healthcare",
-      location: "Lucknow, Uttar Pradesh"
-    },
-    {
-      src: PersonalImage4,
-      title: "Rehabilitation Success",
-      description: "Animals fully recovered and ready for adoption",
-      category: "Success",
-      location: "Bhopal, Madhya Pradesh"
-    },
-    {
-      src: HeroImg,
-      title: "Emergency Response",
-      description: "24/7 emergency response team in action",
-      category: "Emergency",
-      location: "Gurgaon, Haryana"
-    }
+    PersonalImage1,
+    PersonalImage2,
+    PersonalImage3,
+    PersonalImage4,
+    HeroImg,
+    AboutImg,
+    ImpactImg,
+    PersonalImage1,
+    PersonalImage2,
+    PersonalImage3,
+    PersonalImage4,
+    HeroImg
   ];
 
   return (
@@ -648,26 +576,21 @@ const PaymentPage = () => {
             </div>
           </div>
 
-          {/* Gallery Grid */}
+          {/* Gallery Grid - Clean images without text overlays */}
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {galleryImages.map((image, index) => (
                 <div key={index} className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                   <div className="aspect-[4/3] relative">
                     <img 
-                      src={image.src} 
-                      alt={image.title}
+                      src={image} 
+                      alt={`Rescue story ${index + 1}`}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
-                    {/* Category Badge */}
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        {image.category}
-                      </span>
-                    </div>
-
+                    {/* Simple hover overlay without text */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
                     {/* Play button for some images (simulating videos) */}
                     {index % 4 === 0 && (
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -676,16 +599,6 @@ const PaymentPage = () => {
                         </div>
                       </div>
                     )}
-                    
-                    {/* Content Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                      <h3 className="font-bold text-lg mb-1">{image.title}</h3>
-                      <p className="text-sm opacity-90 mb-2">{image.description}</p>
-                      <div className="flex items-center text-xs opacity-75">
-                        <MapPin className="h-3 w-3 mr-1" />
-                        <span>{image.location}</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               ))}
