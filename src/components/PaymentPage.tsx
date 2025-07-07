@@ -129,7 +129,7 @@ const PaymentPage = () => {
         },
         
         theme: { 
-          color: '#F37254' 
+          color: '#3B82F6' 
         },
         
         method: {
@@ -274,7 +274,7 @@ const PaymentPage = () => {
               </div>
             </div>
 
-            {/* Campaign Description */}
+            {/* About This Campaign Section */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Campaign</h2>
               <div className="prose prose-gray max-w-none">
@@ -292,11 +292,12 @@ const PaymentPage = () => {
                 <div className="bg-blue-50 rounded-lg p-4 mb-6">
                   <h3 className="font-semibold text-blue-900 mb-2">How Your Donation Helps:</h3>
                   <ul className="text-blue-800 space-y-1">
+                    <li>• ₹25 - Feeds 1 street dog for a day</li>
                     <li>• ₹100 - Feeds 5 street dogs for a day</li>
-                    <li>• ₹500 - Provides basic medical care and vaccination</li>
-                    <li>• ₹1000 - Covers sterilization surgery for one animal</li>
-                    <li>• ₹2500 - Emergency surgery and rehabilitation</li>
-                    <li>• ₹5000 - Complete rescue and adoption process</li>
+                    <li>• ₹250 - Basic medical care and vaccination</li>
+                    <li>• ₹500 - Sterilization surgery for one animal</li>
+                    <li>• ₹1000 - Emergency surgery and rehabilitation</li>
+                    <li>• ₹2500 - Complete rescue and adoption process</li>
                   </ul>
                 </div>
               </div>
@@ -390,23 +391,70 @@ const PaymentPage = () => {
                 </div>
               )}
 
-              {/* Amount Selection */}
+              {/* Select Amount */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  {predefinedAmounts.map((amt) => (
-                    <button
-                      key={amt}
-                      onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
-                      className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                        selectedAmount === amt && !customAmount
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                      }`}
-                    >
-                      ₹{amt.toLocaleString()}
-                    </button>
-                  ))}
+                  <button
+                    onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 100 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹100
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(250); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 250 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹250
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 500 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹500
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 1000 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹1000
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(2500); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 2500 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹2,500
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(5000); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 5000 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹5,000
+                  </button>
                 </div>
                 <input
                   type="number"
@@ -417,7 +465,7 @@ const PaymentPage = () => {
                 />
               </div>
 
-              {/* Donor Information */}
+              {/* Your Information */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Your Information</label>
                 <div className="space-y-3">
@@ -490,14 +538,14 @@ const PaymentPage = () => {
                 )}
               </div>
 
-              {/* Payment Button */}
+              {/* Donate Now Button */}
               <button
                 onClick={handlePayment}
                 disabled={isProcessing}
                 className={`w-full py-4 rounded-lg font-semibold text-lg flex justify-center items-center transition-all duration-300 ${
                   isProcessing 
                     ? 'bg-gray-400 cursor-not-allowed text-white' 
-                    : 'bg-orange-600 hover:bg-orange-700 text-white shadow-lg hover:shadow-xl'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
                 }`}
               >
                 {isProcessing ? (
@@ -507,8 +555,7 @@ const PaymentPage = () => {
                   </>
                 ) : (
                   <>
-                    <Lock className="h-5 w-5 mr-3" /> 
-                    Donate ₹{(customAmount || selectedAmount).toLocaleString()} Securely
+                    Donate Securely
                   </>
                 )}
               </button>
@@ -549,8 +596,11 @@ const PaymentPage = () => {
                   {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
                     <p>• Medical care & vaccination for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) < 500 && (
-                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 20)} street dogs</p>
+                  {(customAmount || selectedAmount) >= 250 && (customAmount || selectedAmount) < 500 && (
+                    <p>• Basic medical care for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) < 250 && (
+                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs</p>
                   )}
                 </div>
               </div>
