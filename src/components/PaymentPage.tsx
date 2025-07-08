@@ -258,7 +258,23 @@ const PaymentPage = () => {
           {/* Left Column - Donation Form (Mobile First) */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Donation Form - Now First */}
+            {/* Hero Section */}
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+              <div className="relative h-64 sm:h-80">
+                <img 
+                  src={PersonalImage1} 
+                  alt="Animal rescue"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div className="absolute bottom-4 left-4 right-4 text-white">
+                  <h1 className="text-2xl sm:text-3xl font-bold mb-2">Help Us Save Street Animals</h1>
+                  <p className="text-lg opacity-90">Every donation helps us rescue, treat, and rehome animals in need</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Donation Form - Now in Middle */}
             <div className="bg-white rounded-2xl shadow-xl p-6 lg:hidden border border-gray-100">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation</h2>
               
@@ -470,22 +486,6 @@ const PaymentPage = () => {
                   {(customAmount || selectedAmount) < 250 && (
                     <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs for a day</p>
                   )}
-                </div>
-              </div>
-            </div>
-
-            {/* Hero Section */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-              <div className="relative h-64 sm:h-80">
-                <img 
-                  src={PersonalImage1} 
-                  alt="Animal rescue"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h1 className="text-2xl sm:text-3xl font-bold mb-2">Help Us Save Street Animals</h1>
-                  <p className="text-lg opacity-90">Every donation helps us rescue, treat, and rehome animals in need</p>
                 </div>
               </div>
             </div>
