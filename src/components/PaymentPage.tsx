@@ -288,7 +288,27 @@ const PaymentPage = () => {
               {/* Select Amount */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <button
+                    onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 25 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹25
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 50 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹50
+                  </button>
                   <button
                     onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
                     className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
@@ -300,14 +320,14 @@ const PaymentPage = () => {
                     ₹100
                   </button>
                   <button
-                    onClick={() => { setSelectedAmount(250); setCustomAmount(''); }}
+                    onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
                     className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 250 && !customAmount
+                      selectedAmount === 200 && !customAmount
                         ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
                         : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    ₹250
+                    ₹200
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
@@ -327,27 +347,7 @@ const PaymentPage = () => {
                         : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
-                    ₹1000
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(2500); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 2500 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    ₹2,500
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(5000); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 5000 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    ₹5,000
+                    ₹1,000
                   </button>
                 </div>
                 <input
@@ -468,22 +468,25 @@ const PaymentPage = () => {
                   Your Impact
                 </h4>
                 <div className="text-sm text-gray-700">
-                  {customAmount || selectedAmount >= 5000 && (
-                    <p>• Complete rescue & adoption process for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 2500 && (customAmount || selectedAmount) < 5000 && (
+                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
                     <p>• Emergency surgery & rehabilitation for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
+                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
                     <p>• Sterilization surgery for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
+                  {(customAmount || selectedAmount) >= 200 && (customAmount || selectedAmount) < 500 && (
                     <p>• Medical care & vaccination for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 250 && (customAmount || selectedAmount) < 500 && (
+                  {(customAmount || selectedAmount) >= 100 && (customAmount || selectedAmount) < 200 && (
                     <p>• Basic medical care for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) < 250 && (
+                  {(customAmount || selectedAmount) >= 50 && (customAmount || selectedAmount) < 100 && (
+                    <p>• Feeds 2 street dogs for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 25 && (customAmount || selectedAmount) < 50 && (
+                    <p>• Feeds 1 street dog for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) < 25 && (
                     <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs for a day</p>
                   )}
                 </div>
@@ -804,22 +807,25 @@ const PaymentPage = () => {
                   Your Impact
                 </h4>
                 <div className="text-sm text-gray-700">
-                  {customAmount || selectedAmount >= 5000 && (
-                    <p>• Complete rescue & adoption process for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 2500 && (customAmount || selectedAmount) < 5000 && (
+                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
                     <p>• Emergency surgery & rehabilitation for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
+                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
                     <p>• Sterilization surgery for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
+                  {(customAmount || selectedAmount) >= 200 && (customAmount || selectedAmount) < 500 && (
                     <p>• Medical care & vaccination for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 250 && (customAmount || selectedAmount) < 500 && (
+                  {(customAmount || selectedAmount) >= 100 && (customAmount || selectedAmount) < 200 && (
                     <p>• Basic medical care for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) < 250 && (
+                  {(customAmount || selectedAmount) >= 50 && (customAmount || selectedAmount) < 100 && (
+                    <p>• Feeds 2 street dogs for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 25 && (customAmount || selectedAmount) < 50 && (
+                    <p>• Feeds 1 street dog for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) < 25 && (
                     <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs for a day</p>
                   )}
                 </div>
