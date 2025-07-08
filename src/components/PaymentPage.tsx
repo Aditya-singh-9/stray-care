@@ -583,6 +583,26 @@ const PaymentPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <button
+                    onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 25 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹25
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
+                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                      selectedAmount === 50 && !customAmount
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                    }`}
+                  >
+                    ₹50
+                  </button>
+                  <button
                     onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
                     className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
                       selectedAmount === 100 && !customAmount
@@ -593,14 +613,14 @@ const PaymentPage = () => {
                     ₹100
                   </button>
                   <button
-                    onClick={() => { setSelectedAmount(250); setCustomAmount(''); }}
+                    onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
                     className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 250 && !customAmount
+                      selectedAmount === 200 && !customAmount
                         ? 'border-blue-500 bg-blue-50 text-blue-700'
                         : 'border-gray-200 hover:border-blue-300 text-gray-700'
                     }`}
                   >
-                    ₹250
+                    ₹200
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
@@ -620,27 +640,7 @@ const PaymentPage = () => {
                         : 'border-gray-200 hover:border-blue-300 text-gray-700'
                     }`}
                   >
-                    ₹1000
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(2500); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 2500 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹2,500
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(5000); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 5000 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹5,000
+                    ₹1,000
                   </button>
                 </div>
                 <input
