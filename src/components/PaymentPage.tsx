@@ -258,195 +258,8 @@ const PaymentPage = () => {
           {/* Left Column - Donation Form (Mobile First) */}
           <div className="lg:col-span-2 space-y-6">
             
-            {/* Donation Form - Now First */}
-            <div className="bg-white rounded-lg shadow-sm p-6 lg:hidden">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation</h2>
-              
-              {error && (
-                <div className="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center">
-                  <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
-                  <span className="text-sm">{error}</span>
-                </div>
-              )}
-
-              {/* Select Amount */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <button
-                    onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 100 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹100
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(250); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 250 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹250
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 500 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹500
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 1000 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹1000
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(2500); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 2500 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹2,500
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(5000); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 5000 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
-                    }`}
-                  >
-                    ₹5,000
-                  </button>
-                </div>
-                <input
-                  type="number"
-                  placeholder="Enter custom amount"
-                  value={customAmount}
-                  onChange={(e) => setCustomAmount(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Your Information */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">Your Information</label>
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    placeholder="Full Name *"
-                    value={donorInfo.name}
-                    onChange={(e) => setDonorInfo({ ...donorInfo, name: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email Address *"
-                    value={donorInfo.email}
-                    onChange={(e) => setDonorInfo({ ...donorInfo, email: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                  <input
-                    type="tel"
-                    placeholder="Phone Number *"
-                    value={donorInfo.phone}
-                    onChange={(e) => setDonorInfo({ ...donorInfo, phone: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* 80G Tax Exemption */}
-              <div className="mb-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
-                <label className="flex items-start space-x-3 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={taxExemption} 
-                    onChange={(e) => setTaxExemption(e.target.checked)}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 mt-0.5"
-                  />
-                  <div>
-                    <span className="font-medium text-gray-900">Claim 80G Tax Exemption</span>
-                    <p className="text-sm text-gray-600 mt-1">Get tax benefits up to 50% under Section 80G</p>
-                  </div>
-                </label>
-                
-                {taxExemption && (
-                  <div className="mt-4 space-y-3">
-                    <input 
-                      type="text" 
-                      placeholder="PAN Number *" 
-                      value={pan} 
-                      onChange={(e) => setPan(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    />
-                    <input 
-                      type="text" 
-                      placeholder="Aadhaar Number *" 
-                      value={aadhaar} 
-                      onChange={(e) => setAadhaar(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
-                    />
-                    <textarea 
-                      rows={3} 
-                      placeholder="Complete Address with Pincode *" 
-                      value={address} 
-                      onChange={(e) => setAddress(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" 
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Donate Now Button */}
-              <button
-                onClick={handlePayment}
-                disabled={isProcessing}
-                className={`w-full py-4 rounded-lg font-semibold text-lg flex justify-center items-center transition-all duration-300 ${
-                  isProcessing 
-                    ? 'bg-gray-400 cursor-not-allowed text-white' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                }`}
-              >
-                {isProcessing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    Donate Securely
-                  </>
-                )}
-              </button>
-
-              {/* Security Info */}
-              <div className="mt-4 flex items-center justify-center text-gray-500 text-sm">
-                <Shield className="h-4 w-4 mr-2 text-green-500" />
-                <span>Secured by Razorpay • SSL Encrypted</span>
-              </div>
-            </div>
-
             {/* Hero Section */}
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
               <div className="relative h-64 sm:h-80">
                 <img 
                   src={PersonalImage1} 
@@ -461,8 +274,227 @@ const PaymentPage = () => {
               </div>
             </div>
 
+            {/* Donation Form - Now in Middle */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 lg:hidden border border-gray-100">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation</h2>
+              
+              {error && (
+                <div className="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center">
+                  <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
+                  <span className="text-sm">{error}</span>
+                </div>
+              )}
+
+              {/* Select Amount */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
+                <div className="grid grid-cols-3 gap-4 mb-4">
+                  <button
+                    onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 25 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹25
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 50 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹50
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 100 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹100
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 200 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹200
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 500 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹500
+                  </button>
+                  <button
+                    onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
+                      selectedAmount === 1000 && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    ₹1,000
+                  </button>
+                </div>
+                <input
+                  type="number"
+                  placeholder="Enter custom amount"
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
+                />
+              </div>
+
+              {/* Your Information */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Your Information</label>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Full Name *"
+                    value={donorInfo.name}
+                    onChange={(e) => setDonorInfo({ ...donorInfo, name: e.target.value })}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email Address *"
+                    value={donorInfo.email}
+                    onChange={(e) => setDonorInfo({ ...donorInfo, email: e.target.value })}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number *"
+                    value={donorInfo.phone}
+                    onChange={(e) => setDonorInfo({ ...donorInfo, phone: e.target.value })}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* 80G Tax Exemption */}
+              <div className="mb-6 p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+                <label className="flex items-start space-x-3 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={taxExemption} 
+                    onChange={(e) => setTaxExemption(e.target.checked)}
+                    className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 mt-0.5"
+                  />
+                  <div>
+                    <span className="font-medium text-gray-900">Claim 80G Tax Exemption</span>
+                    <p className="text-sm text-gray-600 mt-1">Get tax benefits up to 50% under Section 80G</p>
+                  </div>
+                </label>
+                
+                {taxExemption && (
+                  <div className="mt-5 space-y-4">
+                    <input 
+                      type="text" 
+                      placeholder="PAN Number *" 
+                      value={pan} 
+                      onChange={(e) => setPan(e.target.value)} 
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg" 
+                    />
+                    <input 
+                      type="text" 
+                      placeholder="Aadhaar Number *" 
+                      value={aadhaar} 
+                      onChange={(e) => setAadhaar(e.target.value)} 
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg" 
+                    />
+                    <textarea 
+                      rows={3} 
+                      placeholder="Complete Address with Pincode *" 
+                      value={address} 
+                      onChange={(e) => setAddress(e.target.value)} 
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none text-lg" 
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Donate Now Button */}
+              <button
+                onClick={handlePayment}
+                disabled={isProcessing}
+                className={`w-full py-5 rounded-xl font-bold text-xl flex justify-center items-center transition-all duration-300 shadow-lg ${
+                  isProcessing 
+                    ? 'bg-gray-400 cursor-not-allowed text-white' 
+                    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white hover:shadow-xl transform hover:scale-105'
+                }`}
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-6 w-6 mr-3" />
+                    Donate Securely
+                  </>
+                )}
+              </button>
+
+              {/* Security Info */}
+              <div className="mt-6 flex items-center justify-center text-gray-500 text-sm">
+                <Shield className="h-4 w-4 mr-2 text-green-500" />
+                <span>Secured by Razorpay • SSL Encrypted</span>
+              </div>
+              
+              {/* Quick Impact Preview for Mobile */}
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200">
+                <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
+                  <Heart className="h-5 w-5 text-red-500 mr-2" />
+                  Your Impact
+                </h4>
+                <div className="text-sm text-gray-700">
+                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
+                    <p>• Emergency surgery & rehabilitation for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
+                    <p>• Sterilization surgery for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 200 && (customAmount || selectedAmount) < 500 && (
+                    <p>• Medical care & vaccination for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 100 && (customAmount || selectedAmount) < 200 && (
+                    <p>• Basic medical care for 1 animal</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 50 && (customAmount || selectedAmount) < 100 && (
+                    <p>• Feeds 2 street dogs for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 25 && (customAmount || selectedAmount) < 50 && (
+                    <p>• Feeds 1 street dog for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) < 25 && (
+                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs for a day</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* About This Campaign Section */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Campaign</h2>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
@@ -476,9 +508,9 @@ const PaymentPage = () => {
                   in an animal's life.
                 </p>
                 
-                <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                  <h3 className="font-semibold text-blue-900 mb-2">How Your Donation Helps:</h3>
-                  <ul className="text-blue-800 space-y-1">
+                <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-5 mb-6 border border-orange-200">
+                  <h3 className="font-semibold text-orange-900 mb-3">How Your Donation Helps:</h3>
+                  <ul className="text-orange-800 space-y-2">
                     <li>• ₹25 - Feeds 1 street dog for a day</li>
                     <li>• ₹100 - Feeds 5 street dogs for a day</li>
                     <li>• ₹250 - Basic medical care and vaccination</li>
@@ -491,11 +523,11 @@ const PaymentPage = () => {
             </div>
 
             {/* Impact Statistics */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
               <h3 className="text-xl font-bold text-gray-900 mb-6">Our Impact So Far</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {impactStats.map((stat, index) => (
-                  <div key={index} className={`${stat.bg} rounded-lg p-4 text-center`}>
+                  <div key={index} className={`${stat.bg} rounded-xl p-5 text-center border border-gray-100 hover:shadow-md transition-shadow`}>
                     <stat.icon className={`h-8 w-8 ${stat.color} mx-auto mb-2`} />
                     <div className="text-2xl font-bold text-gray-900">{stat.num}+</div>
                     <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
@@ -505,11 +537,11 @@ const PaymentPage = () => {
             </div>
 
             {/* Testimonials */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
               <h3 className="text-xl font-bold text-gray-900 mb-6">What People Say</h3>
               <div className="space-y-4">
                 {testimonials.map((testimonial, index) => (
-                  <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                  <div key={index} className="border-l-4 border-orange-500 pl-4 py-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-r-xl">
                     <div className="flex items-start space-x-3">
                       <img 
                         src={testimonial.image} 
@@ -531,32 +563,32 @@ const PaymentPage = () => {
             </div>
 
             {/* Contact Information */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Us</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5 text-blue-600" />
+                  <Phone className="h-5 w-5 text-orange-600" />
                   <div>
                     <div className="font-medium text-gray-900">Emergency Helpline</div>
-                    <div className="text-blue-600">+91 9323263322</div>
+                    <div className="text-orange-600">+91 9323263322</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5 text-blue-600" />
+                  <Mail className="h-5 w-5 text-orange-600" />
                   <div>
                     <div className="font-medium text-gray-900">Email Support</div>
-                    <div className="text-blue-600">gullystrayc@gmail.com</div>
+                    <div className="text-orange-600">gullystrayc@gmail.com</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-blue-600" />
+                  <Clock className="h-5 w-5 text-orange-600" />
                   <div>
                     <div className="font-medium text-gray-900">Support Hours</div>
                     <div className="text-gray-600">9:00 AM - 9:00 PM Daily</div>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Globe className="h-5 w-5 text-blue-600" />
+                  <Globe className="h-5 w-5 text-orange-600" />
                   <div>
                     <div className="font-medium text-gray-900">Coverage</div>
                     <div className="text-gray-600">12+ Cities Across India</div>
@@ -568,11 +600,11 @@ const PaymentPage = () => {
 
           {/* Right Column - Donation Form */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8 hidden lg:block">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-8 hidden lg:block border border-gray-100">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation</h2>
               
               {error && (
-                <div className="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center">
+                <div className="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center">
                   <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="text-sm">{error}</span>
                 </div>
@@ -584,60 +616,60 @@ const PaymentPage = () => {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <button
                     onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
                       selectedAmount === 25 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     ₹25
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
                       selectedAmount === 50 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     ₹50
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
                       selectedAmount === 100 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     ₹100
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
                       selectedAmount === 200 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     ₹200
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
                       selectedAmount === 500 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     ₹500
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
-                    className={`p-3 rounded-lg border-2 font-semibold transition-all duration-200 ${
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
                       selectedAmount === 1000 && !customAmount
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-blue-300 text-gray-700'
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
                     }`}
                   >
                     ₹1,000
@@ -648,7 +680,7 @@ const PaymentPage = () => {
                   placeholder="Enter custom amount"
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
@@ -661,7 +693,7 @@ const PaymentPage = () => {
                     placeholder="Full Name *"
                     value={donorInfo.name}
                     onChange={(e) => setDonorInfo({ ...donorInfo, name: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
                   />
                   <input
@@ -669,7 +701,7 @@ const PaymentPage = () => {
                     placeholder="Email Address *"
                     value={donorInfo.email}
                     onChange={(e) => setDonorInfo({ ...donorInfo, email: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
                   />
                   <input
@@ -677,20 +709,20 @@ const PaymentPage = () => {
                     placeholder="Phone Number *"
                     value={donorInfo.phone}
                     onChange={(e) => setDonorInfo({ ...donorInfo, phone: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     required
                   />
                 </div>
               </div>
 
               {/* 80G Tax Exemption */}
-              <div className="mb-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+              <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
                 <label className="flex items-start space-x-3 cursor-pointer">
                   <input 
                     type="checkbox" 
                     checked={taxExemption} 
                     onChange={(e) => setTaxExemption(e.target.checked)}
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 mt-0.5"
+                    className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 mt-0.5"
                   />
                   <div>
                     <span className="font-medium text-gray-900">Claim 80G Tax Exemption</span>
@@ -705,21 +737,21 @@ const PaymentPage = () => {
                       placeholder="PAN Number *" 
                       value={pan} 
                       onChange={(e) => setPan(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent" 
                     />
                     <input 
                       type="text" 
                       placeholder="Aadhaar Number *" 
                       value={aadhaar} 
                       onChange={(e) => setAadhaar(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent" 
                     />
                     <textarea 
                       rows={3} 
                       placeholder="Complete Address with Pincode *" 
                       value={address} 
                       onChange={(e) => setAddress(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" 
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none" 
                     />
                   </div>
                 )}
@@ -729,10 +761,10 @@ const PaymentPage = () => {
               <button
                 onClick={handlePayment}
                 disabled={isProcessing}
-                className={`w-full py-4 rounded-lg font-semibold text-lg flex justify-center items-center transition-all duration-300 ${
+                className={`w-full py-4 rounded-xl font-semibold text-lg flex justify-center items-center transition-all duration-300 shadow-lg ${
                   isProcessing 
                     ? 'bg-gray-400 cursor-not-allowed text-white' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white hover:shadow-xl transform hover:scale-105'
                 }`}
               >
                 {isProcessing ? (
@@ -742,6 +774,7 @@ const PaymentPage = () => {
                   </>
                 ) : (
                   <>
+                    <Lock className="h-5 w-5 mr-2" />
                     Donate Securely
                   </>
                 )}
@@ -754,7 +787,7 @@ const PaymentPage = () => {
               </div>
 
               {/* Tax Benefits Info */}
-              <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+              <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
                 <div className="flex items-center mb-2">
                   <Award className="h-5 w-5 text-green-600 mr-2" />
                   <span className="font-medium text-green-900">Tax Benefits Available</span>
@@ -768,26 +801,32 @@ const PaymentPage = () => {
               </div>
 
               {/* Quick Impact */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h4 className="font-medium text-blue-900 mb-2">Your Impact</h4>
-                <div className="text-sm text-blue-800">
-                  {customAmount || selectedAmount >= 5000 && (
-                    <p>• Complete rescue & adoption process for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 2500 && (customAmount || selectedAmount) < 5000 && (
+              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200">
+                <h4 className="font-medium text-gray-900 mb-2 flex items-center">
+                  <Heart className="h-5 w-5 text-red-500 mr-2" />
+                  Your Impact
+                </h4>
+                <div className="text-sm text-gray-700">
+                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
                     <p>• Emergency surgery & rehabilitation for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
+                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
                     <p>• Sterilization surgery for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
+                  {(customAmount || selectedAmount) >= 200 && (customAmount || selectedAmount) < 500 && (
                     <p>• Medical care & vaccination for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) >= 250 && (customAmount || selectedAmount) < 500 && (
+                  {(customAmount || selectedAmount) >= 100 && (customAmount || selectedAmount) < 200 && (
                     <p>• Basic medical care for 1 animal</p>
                   )}
-                  {(customAmount || selectedAmount) < 250 && (
-                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs</p>
+                  {(customAmount || selectedAmount) >= 50 && (customAmount || selectedAmount) < 100 && (
+                    <p>• Feeds 2 street dogs for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) >= 25 && (customAmount || selectedAmount) < 50 && (
+                    <p>• Feeds 1 street dog for a day</p>
+                  )}
+                  {(customAmount || selectedAmount) < 25 && (
+                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs for a day</p>
                   )}
                 </div>
               </div>
@@ -796,18 +835,18 @@ const PaymentPage = () => {
         </div>
 
         {/* Image Gallery Section - At the bottom */}
-        <div className="mt-16 bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="mt-16 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                  <Camera className="h-7 w-7 mr-3 text-blue-600" />
+                  <Camera className="h-7 w-7 mr-3 text-orange-600" />
                   Our Journey in Pictures
                 </h2>
                 <p className="text-gray-600 mt-2">Witness the impact of your donations through our rescue stories</p>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-blue-600">2,847+</div>
+                <div className="text-2xl font-bold text-orange-600">2,847+</div>
                 <div className="text-sm text-gray-600">Lives Transformed</div>
               </div>
             </div>
@@ -817,7 +856,7 @@ const PaymentPage = () => {
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {galleryImages.map((image, index) => (
-                <div key={index} className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                <div key={index} className="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                   <div className="aspect-[4/3] relative">
                     <img 
                       src={image} 
@@ -843,30 +882,30 @@ const PaymentPage = () => {
 
             {/* Load More Button */}
             <div className="text-center mt-8">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105">
+              <button className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-full hover:from-orange-600 hover:to-red-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105">
                 View More Stories
               </button>
             </div>
           </div>
 
           {/* Gallery Stats */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+          <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 text-white">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
                 <div className="text-3xl font-bold mb-1">2,847</div>
-                <div className="text-blue-100 text-sm">Photos & Videos</div>
+                <div className="text-orange-100 text-sm">Photos & Videos</div>
               </div>
               <div>
                 <div className="text-3xl font-bold mb-1">550+</div>
-                <div className="text-blue-100 text-sm">Rescue Stories</div>
+                <div className="text-orange-100 text-sm">Rescue Stories</div>
               </div>
               <div>
                 <div className="text-3xl font-bold mb-1">12</div>
-                <div className="text-blue-100 text-sm">Cities Covered</div>
+                <div className="text-orange-100 text-sm">Cities Covered</div>
               </div>
               <div>
                 <div className="text-3xl font-bold mb-1">24/7</div>
-                <div className="text-blue-100 text-sm">Always Available</div>
+                <div className="text-orange-100 text-sm">Always Available</div>
               </div>
             </div>
           </div>
