@@ -3,6 +3,7 @@ import { Heart, Shield, CheckCircle, Lock, Award } from 'lucide-react';
 
 const Donation: React.FC = () => {
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
+  const [donationType, setDonationType] = useState<'onetime' | 'monthly'>('monthly');
   const [customAmount, setCustomAmount] = useState<string>('');
   const [donorInfo, setDonorInfo] = useState({
     name: '',
@@ -28,7 +29,12 @@ const Donation: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/orders`, {
+      let endpoint = '/api/payment/orders';
+      if (donationType === 'monthly') {
+        endpoint = '/api/payment/subscription';
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,17 +42,20 @@ const Donation: React.FC = () => {
         body: JSON.stringify({ amount }),
       });
 
-      const order = await response.json();
+      const data = await response.json();
 
-      const options = {
+      const options: any = {
         key: 'rzp_live_CVLoRP0AMxJhjw',
-        amount: order.amount,
-        currency: order.currency,
         name: "GullyStray Care",
-        description: "Thank you for your contribution",
+        description: donationType === 'monthly' ? "Monthly Donation" : "Thank you for your contribution",
         image: "",
-        order_id: order.id,
         handler: async function (response: any) {
+          if (donationType === 'monthly') {
+            alert("Subscription Successful! Payment ID: " + response.razorpay_payment_id);
+            console.log("Subscription response:", response);
+            return;
+          }
+
           try {
             const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
               method: 'POST',
@@ -84,15 +93,20 @@ const Donation: React.FC = () => {
         theme: { color: "#F37254" }
       };
 
+      if (donationType === 'monthly') {
+        options.subscription_id = data.subscription_id;
+      } else {
+        options.amount = data.amount;
+        options.currency = data.currency;
+        options.order_id = data.id;
+      }
+
       const rzp1 = new (window as any).Razorpay(options);
       rzp1.open();
     } catch (error) {
       console.error('Error initiating payment:', error);
       alert('Failed to initiate payment. Please try again.');
     }
-
-    const rzp1 = new (window as any).Razorpay(options);
-    rzp1.open();
   };
 
   return (
@@ -101,6 +115,31 @@ const Donation: React.FC = () => {
         {/* Donation Form */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-8 border">
           <h2 className="text-3xl font-bold mb-6">Make a Secure Donation</h2>
+
+          {/* Donation Type Toggle */}
+          <div className="mb-8">
+            <label className="block font-semibold mb-4">Donation Frequency</label>
+            <div className="flex p-1 bg-gray-100 rounded-xl">
+              <button
+                onClick={() => setDonationType('monthly')}
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'monthly'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setDonationType('onetime')}
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'onetime'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                One-Time
+              </button>
+            </div>
+          </div>
 
           {/* Amount Selection */}
           <div className="mb-8">

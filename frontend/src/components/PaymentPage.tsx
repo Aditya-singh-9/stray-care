@@ -22,7 +22,7 @@ const PaymentPage = () => {
 
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
-  const [donationType, setDonationType] = useState<'onetime' | 'monthly'>('onetime');
+  const [donationType, setDonationType] = useState<'onetime' | 'monthly'>('monthly');
   const [donorInfo, setDonorInfo] = useState({ name: '', email: '', phone: '' });
   const [error, setError] = useState<string | null>(null);
   const [taxExemption, setTaxExemption] = useState(false);
