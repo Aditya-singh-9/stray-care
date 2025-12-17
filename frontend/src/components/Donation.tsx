@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Shield, CheckCircle, Lock, Award } from 'lucide-react';
 
-const PaymentPage: React.FC = () => {
+const Donation: React.FC = () => {
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
   const [donorInfo, setDonorInfo] = useState({
@@ -19,7 +19,7 @@ const PaymentPage: React.FC = () => {
     document.body.appendChild(script);
   }, []);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
 
     if (!donorInfo.name || !donorInfo.email || !donorInfo.phone) {
@@ -27,33 +27,69 @@ const PaymentPage: React.FC = () => {
       return;
     }
 
-    const options = {
-      key: 'rzp_live_CVLoRP0AMxJhjw',  
-      amount: amount * 100, 
-      currency: "INR",
-      name: "GullyStray Care",
-      description: "Thank you for your contribution",
-      image: "", 
-      handler: function (response: any) {
-        alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
-        console.log("Full payment object:", response);
-      },
-      prefill: {
-        name: donorInfo.name,
-        email: donorInfo.email,
-        contact: donorInfo.phone
-      },
-      notes: {
-        donation_purpose: "Animal Rescue"
-      },
-      theme: { color: "#F37254" },
-      method: {
-        netbanking: true,
-        card: true,
-        upi: true,
-        wallet: true
-      }
-    };
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount }),
+      });
+
+      const order = await response.json();
+
+      const options = {
+        key: 'rzp_live_CVLoRP0AMxJhjw',
+        amount: order.amount,
+        currency: order.currency,
+        name: "GullyStray Care",
+        description: "Thank you for your contribution",
+        image: "",
+        order_id: order.id,
+        handler: async function (response: any) {
+          try {
+            const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyResult = await verifyResponse.json();
+
+            if (verifyResponse.ok) {
+              alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+              console.log("Full payment object:", response);
+            } else {
+              alert(verifyResult.message || 'Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Verification Error:', error);
+            alert('Payment verification failed');
+          }
+        },
+        prefill: {
+          name: donorInfo.name,
+          email: donorInfo.email,
+          contact: donorInfo.phone
+        },
+        notes: {
+          donation_purpose: "Animal Rescue"
+        },
+        theme: { color: "#F37254" }
+      };
+
+      const rzp1 = new (window as any).Razorpay(options);
+      rzp1.open();
+    } catch (error) {
+      console.error('Error initiating payment:', error);
+      alert('Failed to initiate payment. Please try again.');
+    }
 
     const rzp1 = new (window as any).Razorpay(options);
     rzp1.open();
@@ -74,9 +110,8 @@ const PaymentPage: React.FC = () => {
                 <button
                   key={amt}
                   onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
-                  className={`p-4 rounded-xl border font-semibold ${
-                    selectedAmount === amt && !customAmount ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-md' : 'border-gray-200 hover:border-amber-300'
-                  }`}
+                  className={`p-4 rounded-xl border font-semibold ${selectedAmount === amt && !customAmount ? 'border-amber-500 bg-amber-50 text-amber-700 shadow-md' : 'border-gray-200 hover:border-amber-300'
+                    }`}
                 >
                   ₹{amt}
                 </button>
@@ -95,10 +130,10 @@ const PaymentPage: React.FC = () => {
           <div className="mb-8">
             <label className="block font-semibold mb-4">Donor Information</label>
             <div className="grid md:grid-cols-2 gap-4 mb-4">
-              <input type="text" placeholder="Full Name *" value={donorInfo.name} onChange={(e) => setDonorInfo({...donorInfo, name: e.target.value})} className="p-4 border rounded-xl" required />
-              <input type="email" placeholder="Email *" value={donorInfo.email} onChange={(e) => setDonorInfo({...donorInfo, email: e.target.value})} className="p-4 border rounded-xl" required />
+              <input type="text" placeholder="Full Name *" value={donorInfo.name} onChange={(e) => setDonorInfo({ ...donorInfo, name: e.target.value })} className="p-4 border rounded-xl" required />
+              <input type="email" placeholder="Email *" value={donorInfo.email} onChange={(e) => setDonorInfo({ ...donorInfo, email: e.target.value })} className="p-4 border rounded-xl" required />
             </div>
-            <input type="tel" placeholder="Phone *" value={donorInfo.phone} onChange={(e) => setDonorInfo({...donorInfo, phone: e.target.value})} className="w-full p-4 border rounded-xl" required />
+            <input type="tel" placeholder="Phone *" value={donorInfo.phone} onChange={(e) => setDonorInfo({ ...donorInfo, phone: e.target.value })} className="w-full p-4 border rounded-xl" required />
           </div>
 
           {/* Donate Button */}
@@ -143,4 +178,4 @@ const PaymentPage: React.FC = () => {
   );
 };
 
-export default PaymentPage;
+export default Donation;

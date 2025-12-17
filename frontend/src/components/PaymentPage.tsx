@@ -90,33 +90,68 @@ const PaymentPage = () => {
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
 
     try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount }),
+      });
+
+      const order = await response.json();
+
       const options = {
         key: 'rzp_live_CVLoRP0AMxJhjw',
-        amount: amount * 100,
-        currency: 'INR',
+        amount: order.amount,
+        currency: order.currency,
         name: 'GullyStray Care',
         description: 'Donation for Animal Welfare',
         image: Logo,
-        
-        handler: function (response: any) {
+        order_id: order.id,
+
+        handler: async function (response: any) {
           console.log('Payment Success:', response);
-          navigate('/thank-you', {
-            state: {
-              name: donorInfo.name,
-              amount: amount,
-              paymentId: response.razorpay_payment_id,
-              orderId: response.razorpay_order_id || 'N/A',
-              signature: response.razorpay_signature || 'N/A'
-            },
-          });
+
+          try {
+            const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyResult = await verifyResponse.json();
+
+            if (verifyResponse.ok) {
+              navigate('/thank-you', {
+                state: {
+                  name: donorInfo.name,
+                  amount: amount,
+                  paymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id || 'N/A',
+                  signature: response.razorpay_signature || 'N/A'
+                },
+              });
+            } else {
+              alert(verifyResult.message || 'Payment verification failed');
+            }
+          } catch (error) {
+            console.error('Verification Error:', error);
+            alert('Payment verification failed');
+          }
         },
-        
+
         prefill: {
           name: donorInfo.name,
           email: donorInfo.email,
           contact: donorInfo.phone,
         },
-        
+
         notes: {
           donation_purpose: 'Animal Rescue',
           donor_name: donorInfo.name,
@@ -127,18 +162,11 @@ const PaymentPage = () => {
           aadhaar: aadhaar || '',
           address: address || ''
         },
-        
-        theme: { 
-          color: '#3B82F6' 
+
+        theme: {
+          color: '#3B82F6'
         },
-        
-        method: {
-          netbanking: true,
-          card: true,
-          upi: true,
-          wallet: true,
-        },
-        
+
         modal: {
           escape: true,
           confirm_close: true,
@@ -147,24 +175,24 @@ const PaymentPage = () => {
             console.log('Payment cancelled by user');
           },
         },
-        
+
         retry: {
           enabled: true,
           max_count: 3
         },
-        
+
         timeout: 300,
         remember_customer: false
       };
 
       const rzp = new window.Razorpay(options);
-      
+
       rzp.on('payment.failed', function (response: any) {
         console.error('Payment Failed:', response.error);
         setIsProcessing(false);
-        
+
         let errorMessage = 'Payment failed. Please try again.';
-        
+
         if (response.error.code === 'BAD_REQUEST_ERROR') {
           errorMessage = 'Invalid payment details. Please check and try again.';
         } else if (response.error.code === 'GATEWAY_ERROR') {
@@ -172,12 +200,12 @@ const PaymentPage = () => {
         } else if (response.error.code === 'NETWORK_ERROR') {
           errorMessage = 'Network error. Please check your connection and try again.';
         }
-        
+
         setError(errorMessage);
       });
 
       rzp.open();
-      
+
     } catch (error) {
       console.error('Error initiating payment:', error);
       setError('Failed to initiate payment. Please try again.');
@@ -193,21 +221,21 @@ const PaymentPage = () => {
   ];
 
   const testimonials = [
-    { 
-      name: "Dr. Priya Sharma", 
-      role: "Veterinary Partner", 
+    {
+      name: "Dr. Priya Sharma",
+      role: "Veterinary Partner",
       quote: "Working with GullyStrayCare has been incredibly rewarding. Their dedication is unmatched.",
       image: PersonalImage1
     },
-    { 
-      name: "Rajesh Kumar", 
-      role: "Monthly Donor", 
+    {
+      name: "Rajesh Kumar",
+      role: "Monthly Donor",
       quote: "The transparency and impact reports give me confidence in supporting this cause.",
       image: PersonalImage2
     },
-    { 
-      name: "Meera Singh", 
-      role: "Volunteer", 
+    {
+      name: "Meera Singh",
+      role: "Volunteer",
       quote: "Being part of rescue operations has been the most fulfilling experience of my life.",
       image: PersonalImage3
     },
@@ -242,7 +270,7 @@ const PaymentPage = () => {
                 <p className="text-xs text-blue-600 font-medium">Compassion in Action</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => navigate('/')}
               className="text-gray-600 hover:text-gray-900 font-medium"
             >
@@ -254,15 +282,15 @@ const PaymentPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
-          
+
           {/* Left Column - Donation Form (Mobile First) */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {/* Hero Section */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
               <div className="relative h-64 sm:h-80">
-                <img 
-                  src={PersonalImage1} 
+                <img
+                  src={PersonalImage1}
                   alt="Animal rescue"
                   className="w-full h-full object-cover"
                 />
@@ -277,7 +305,7 @@ const PaymentPage = () => {
             {/* Donation Form - Now in Middle */}
             <div className="bg-white rounded-2xl shadow-xl p-6 lg:hidden border border-gray-100">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation</h2>
-              
+
               {error && (
                 <div className="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center">
                   <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -291,61 +319,55 @@ const PaymentPage = () => {
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <button
                     onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 25 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 25 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹25
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 50 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 50 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹50
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 100 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 100 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹100
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 200 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 200 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹200
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 500 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 500 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹500
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${
-                      selectedAmount === 1000 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 1000 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹1,000
                   </button>
@@ -393,9 +415,9 @@ const PaymentPage = () => {
               {/* 80G Tax Exemption */}
               <div className="mb-6 p-5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
                 <label className="flex items-start space-x-3 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={taxExemption} 
+                  <input
+                    type="checkbox"
+                    checked={taxExemption}
                     onChange={(e) => setTaxExemption(e.target.checked)}
                     className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 mt-0.5"
                   />
@@ -404,29 +426,29 @@ const PaymentPage = () => {
                     <p className="text-sm text-gray-600 mt-1">Get tax benefits up to 50% under Section 80G</p>
                   </div>
                 </label>
-                
+
                 {taxExemption && (
                   <div className="mt-5 space-y-4">
-                    <input 
-                      type="text" 
-                      placeholder="PAN Number *" 
-                      value={pan} 
-                      onChange={(e) => setPan(e.target.value)} 
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg" 
+                    <input
+                      type="text"
+                      placeholder="PAN Number *"
+                      value={pan}
+                      onChange={(e) => setPan(e.target.value)}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
                     />
-                    <input 
-                      type="text" 
-                      placeholder="Aadhaar Number *" 
-                      value={aadhaar} 
-                      onChange={(e) => setAadhaar(e.target.value)} 
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg" 
+                    <input
+                      type="text"
+                      placeholder="Aadhaar Number *"
+                      value={aadhaar}
+                      onChange={(e) => setAadhaar(e.target.value)}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
                     />
-                    <textarea 
-                      rows={3} 
-                      placeholder="Complete Address with Pincode *" 
-                      value={address} 
-                      onChange={(e) => setAddress(e.target.value)} 
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none text-lg" 
+                    <textarea
+                      rows={3}
+                      placeholder="Complete Address with Pincode *"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none text-lg"
                     />
                   </div>
                 )}
@@ -436,11 +458,10 @@ const PaymentPage = () => {
               <button
                 onClick={handlePayment}
                 disabled={isProcessing}
-                className={`w-full py-5 rounded-xl font-bold text-xl flex justify-center items-center transition-all duration-300 shadow-lg ${
-                  isProcessing 
-                    ? 'bg-gray-400 cursor-not-allowed text-white' 
-                    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white hover:shadow-xl transform hover:scale-105'
-                }`}
+                className={`w-full py-5 rounded-xl font-bold text-xl flex justify-center items-center transition-all duration-300 shadow-lg ${isProcessing
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white hover:shadow-xl transform hover:scale-105'
+                  }`}
               >
                 {isProcessing ? (
                   <>
@@ -460,7 +481,7 @@ const PaymentPage = () => {
                 <Shield className="h-4 w-4 mr-2 text-green-500" />
                 <span>Secured by Razorpay • SSL Encrypted</span>
               </div>
-              
+
               {/* Quick Impact Preview for Mobile */}
               <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200">
                 <h4 className="font-semibold text-gray-900 mb-2 flex items-center">
@@ -498,16 +519,16 @@ const PaymentPage = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-4">About This Campaign</h2>
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  GullyStrayCare is dedicated to rescuing, rehabilitating, and rehoming street animals across India. 
-                  Since our inception during the COVID-19 pandemic, we have been working tirelessly to provide food, 
+                  GullyStrayCare is dedicated to rescuing, rehabilitating, and rehoming street animals across India.
+                  Since our inception during the COVID-19 pandemic, we have been working tirelessly to provide food,
                   medical care, and shelter to animals in need.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Your donation directly supports our emergency rescue operations, medical treatments, sterilization 
-                  programs, and adoption services. Every contribution, no matter the size, makes a real difference 
+                  Your donation directly supports our emergency rescue operations, medical treatments, sterilization
+                  programs, and adoption services. Every contribution, no matter the size, makes a real difference
                   in an animal's life.
                 </p>
-                
+
                 <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-5 mb-6 border border-orange-200">
                   <h3 className="font-semibold text-orange-900 mb-3">How Your Donation Helps:</h3>
                   <ul className="text-orange-800 space-y-2">
@@ -543,8 +564,8 @@ const PaymentPage = () => {
                 {testimonials.map((testimonial, index) => (
                   <div key={index} className="border-l-4 border-orange-500 pl-4 py-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-r-xl">
                     <div className="flex items-start space-x-3">
-                      <img 
-                        src={testimonial.image} 
+                      <img
+                        src={testimonial.image}
                         alt={testimonial.name}
                         className="w-12 h-12 rounded-full object-cover"
                       />
@@ -602,7 +623,7 @@ const PaymentPage = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-8 hidden lg:block border border-gray-100">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Make a Donation</h2>
-              
+
               {error && (
                 <div className="p-4 mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center">
                   <Shield className="h-5 w-5 mr-3 flex-shrink-0" />
@@ -616,61 +637,55 @@ const PaymentPage = () => {
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <button
                     onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 25 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 25 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹25
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 50 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 50 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹50
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 100 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 100 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹100
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 200 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 200 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹200
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 500 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 500 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹500
                   </button>
                   <button
                     onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${
-                      selectedAmount === 1000 && !customAmount
-                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 1000 && !customAmount
+                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     ₹1,000
                   </button>
@@ -718,9 +733,9 @@ const PaymentPage = () => {
               {/* 80G Tax Exemption */}
               <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
                 <label className="flex items-start space-x-3 cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    checked={taxExemption} 
+                  <input
+                    type="checkbox"
+                    checked={taxExemption}
                     onChange={(e) => setTaxExemption(e.target.checked)}
                     className="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 mt-0.5"
                   />
@@ -729,29 +744,29 @@ const PaymentPage = () => {
                     <p className="text-sm text-gray-600 mt-1">Get tax benefits up to 50% under Section 80G</p>
                   </div>
                 </label>
-                
+
                 {taxExemption && (
                   <div className="mt-4 space-y-3">
-                    <input 
-                      type="text" 
-                      placeholder="PAN Number *" 
-                      value={pan} 
-                      onChange={(e) => setPan(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent" 
+                    <input
+                      type="text"
+                      placeholder="PAN Number *"
+                      value={pan}
+                      onChange={(e) => setPan(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
-                    <input 
-                      type="text" 
-                      placeholder="Aadhaar Number *" 
-                      value={aadhaar} 
-                      onChange={(e) => setAadhaar(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent" 
+                    <input
+                      type="text"
+                      placeholder="Aadhaar Number *"
+                      value={aadhaar}
+                      onChange={(e) => setAadhaar(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
-                    <textarea 
-                      rows={3} 
-                      placeholder="Complete Address with Pincode *" 
-                      value={address} 
-                      onChange={(e) => setAddress(e.target.value)} 
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none" 
+                    <textarea
+                      rows={3}
+                      placeholder="Complete Address with Pincode *"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                     />
                   </div>
                 )}
@@ -761,11 +776,10 @@ const PaymentPage = () => {
               <button
                 onClick={handlePayment}
                 disabled={isProcessing}
-                className={`w-full py-4 rounded-xl font-semibold text-lg flex justify-center items-center transition-all duration-300 shadow-lg ${
-                  isProcessing 
-                    ? 'bg-gray-400 cursor-not-allowed text-white' 
-                    : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white hover:shadow-xl transform hover:scale-105'
-                }`}
+                className={`w-full py-4 rounded-xl font-semibold text-lg flex justify-center items-center transition-all duration-300 shadow-lg ${isProcessing
+                  ? 'bg-gray-400 cursor-not-allowed text-white'
+                  : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white hover:shadow-xl transform hover:scale-105'
+                  }`}
               >
                 {isProcessing ? (
                   <>
@@ -858,15 +872,15 @@ const PaymentPage = () => {
               {galleryImages.map((image, index) => (
                 <div key={index} className="group relative overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105">
                   <div className="aspect-[4/3] relative">
-                    <img 
-                      src={image} 
+                    <img
+                      src={image}
                       alt={`Rescue story ${index + 1}`}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
-                    
+
                     {/* Simple hover overlay without text */}
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
+
                     {/* Play button for some images (simulating videos) */}
                     {index % 4 === 0 && (
                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
