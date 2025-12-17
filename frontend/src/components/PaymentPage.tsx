@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Shield, Award, Heart, Users, TrendingUp, MapPin, ArrowRight, CheckCircle, Phone, Mail, Clock, Globe, Star, Quote, Camera, Play } from 'lucide-react';
+import { Lock, Shield, Award, Heart, Users, TrendingUp, MapPin, Phone, Mail, Clock, Globe, Quote, Camera, Play } from 'lucide-react';
 
 import PersonalImage1 from '../assets/images/personal-image1.jpg';
 import PersonalImage2 from '../assets/images/personal-image2.jpg';
@@ -20,10 +20,9 @@ declare global {
 const PaymentPage = () => {
   const navigate = useNavigate();
 
-  const predefinedAmounts = [100, 250, 500, 1000, 2500, 5000];
-
   const [selectedAmount, setSelectedAmount] = useState<number>(500);
   const [customAmount, setCustomAmount] = useState<string>('');
+  const [donationType, setDonationType] = useState<'onetime' | 'monthly'>('onetime');
   const [donorInfo, setDonorInfo] = useState({ name: '', email: '', phone: '' });
   const [error, setError] = useState<string | null>(null);
   const [taxExemption, setTaxExemption] = useState(false);
@@ -90,7 +89,12 @@ const PaymentPage = () => {
     const amount = customAmount ? parseInt(customAmount) : selectedAmount;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/orders`, {
+      let endpoint = '/api/payment/orders';
+      if (donationType === 'monthly') {
+        endpoint = '/api/payment/subscription';
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,62 +102,59 @@ const PaymentPage = () => {
         body: JSON.stringify({ amount }),
       });
 
-      const order = await response.json();
+      const data = await response.json();
 
-      const options = {
-        key: 'rzp_live_CVLoRP0AMxJhjw',
-        amount: order.amount,
-        currency: order.currency,
+      const options: any = {
+        key: 'rzp_live_CVLoRP0AMxJhjw', // Replace with your actual key if different
         name: 'GullyStray Care',
-        description: 'Donation for Animal Welfare',
+        description: donationType === 'monthly' ? 'Monthly Donation' : 'Donation for Animal Welfare',
         image: Logo,
-        order_id: order.id,
-
         handler: async function (response: any) {
           console.log('Payment Success:', response);
 
-          try {
-            const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
-
-            const verifyResult = await verifyResponse.json();
-
-            if (verifyResponse.ok) {
-              navigate('/thank-you', {
-                state: {
-                  name: donorInfo.name,
-                  amount: amount,
-                  paymentId: response.razorpay_payment_id,
-                  orderId: response.razorpay_order_id || 'N/A',
-                  signature: response.razorpay_signature || 'N/A'
+          // Verify payment (skip for subscription for now or implement verify endpoint)
+          if (donationType === 'onetime') {
+            try {
+              const verifyResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
               });
-            } else {
-              alert(verifyResult.message || 'Payment verification failed');
-            }
-          } catch (error) {
-            console.error('Verification Error:', error);
-            alert('Payment verification failed');
-          }
-        },
 
+              const verifyResult = await verifyResponse.json();
+              if (!verifyResponse.ok) {
+                alert(verifyResult.message || 'Payment verification failed');
+                return;
+              }
+            } catch (error) {
+              console.error('Verification Error:', error);
+            }
+          }
+
+          navigate('/thank-you', {
+            state: {
+              name: donorInfo.name,
+              amount: amount,
+              paymentId: response.razorpay_payment_id || 'Subscription',
+              orderId: response.razorpay_order_id || response.razorpay_subscription_id || 'N/A',
+              signature: response.razorpay_signature || 'N/A'
+            },
+          });
+        },
         prefill: {
           name: donorInfo.name,
           email: donorInfo.email,
           contact: donorInfo.phone,
         },
-
         notes: {
           donation_purpose: 'Animal Rescue',
+          donation_type: donationType,
           donor_name: donorInfo.name,
           donor_email: donorInfo.email,
           donor_phone: donorInfo.phone,
@@ -162,11 +163,9 @@ const PaymentPage = () => {
           aadhaar: aadhaar || '',
           address: address || ''
         },
-
         theme: {
           color: '#3B82F6'
         },
-
         modal: {
           escape: true,
           confirm_close: true,
@@ -175,33 +174,29 @@ const PaymentPage = () => {
             console.log('Payment cancelled by user');
           },
         },
-
         retry: {
           enabled: true,
           max_count: 3
         },
-
         timeout: 300,
         remember_customer: false
       };
+
+      if (donationType === 'monthly') {
+        options.subscription_id = data.subscription_id;
+      } else {
+        options.amount = data.amount;
+        options.currency = data.currency;
+        options.order_id = data.id;
+        options.payment_capture = 1;
+      }
 
       const rzp = new window.Razorpay(options);
 
       rzp.on('payment.failed', function (response: any) {
         console.error('Payment Failed:', response.error);
         setIsProcessing(false);
-
-        let errorMessage = 'Payment failed. Please try again.';
-
-        if (response.error.code === 'BAD_REQUEST_ERROR') {
-          errorMessage = 'Invalid payment details. Please check and try again.';
-        } else if (response.error.code === 'GATEWAY_ERROR') {
-          errorMessage = 'Payment gateway error. Please try a different payment method.';
-        } else if (response.error.code === 'NETWORK_ERROR') {
-          errorMessage = 'Network error. Please check your connection and try again.';
-        }
-
-        setError(errorMessage);
+        setError('Payment failed. Please try again.');
       });
 
       rzp.open();
@@ -241,20 +236,10 @@ const PaymentPage = () => {
     },
   ];
 
-  // Gallery images - clean without text overlays
   const galleryImages = [
-    PersonalImage1,
-    PersonalImage2,
-    PersonalImage3,
-    PersonalImage4,
-    HeroImg,
-    AboutImg,
-    ImpactImg,
-    PersonalImage1,
-    PersonalImage2,
-    PersonalImage3,
-    PersonalImage4,
-    HeroImg
+    PersonalImage1, PersonalImage2, PersonalImage3, PersonalImage4,
+    HeroImg, AboutImg, ImpactImg, PersonalImage1,
+    PersonalImage2, PersonalImage3, PersonalImage4, HeroImg
   ];
 
   return (
@@ -313,64 +298,47 @@ const PaymentPage = () => {
                 </div>
               )}
 
+              {/* Donation Type Toggle */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Donation Frequency</label>
+                <div className="flex p-1 bg-gray-100 rounded-xl">
+                  <button
+                    onClick={() => setDonationType('onetime')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'onetime'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                    One-Time
+                  </button>
+                  <button
+                    onClick={() => setDonationType('monthly')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'monthly'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                    Monthly
+                  </button>
+                </div>
+              </div>
+
               {/* Select Amount */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
                 <div className="grid grid-cols-3 gap-4 mb-4">
-                  <button
-                    onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 25 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹25
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 50 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹50
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 100 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹100
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 200 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹200
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 500 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹500
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
-                    className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === 1000 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹1,000
-                  </button>
+                  {[25, 50, 100, 200, 500, 1000].map((amt) => (
+                    <button
+                      key={amt}
+                      onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
+                      className={`p-4 rounded-xl border-2 font-semibold transition-all duration-200 text-lg ${selectedAmount === amt && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                        }`}
+                    >
+                      ₹{amt}
+                    </button>
+                  ))}
                 </div>
                 <input
                   type="number"
@@ -489,27 +457,7 @@ const PaymentPage = () => {
                   Your Impact
                 </h4>
                 <div className="text-sm text-gray-700">
-                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
-                    <p>• Emergency surgery & rehabilitation for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
-                    <p>• Sterilization surgery for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 200 && (customAmount || selectedAmount) < 500 && (
-                    <p>• Medical care & vaccination for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 100 && (customAmount || selectedAmount) < 200 && (
-                    <p>• Basic medical care for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 50 && (customAmount || selectedAmount) < 100 && (
-                    <p>• Feeds 2 street dogs for a day</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 25 && (customAmount || selectedAmount) < 50 && (
-                    <p>• Feeds 1 street dog for a day</p>
-                  )}
-                  {(customAmount || selectedAmount) < 25 && (
-                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs for a day</p>
-                  )}
+                  <p>• Your donation helps us rescue and feed street animals.</p>
                 </div>
               </div>
             </div>
@@ -520,24 +468,13 @@ const PaymentPage = () => {
               <div className="prose prose-gray max-w-none">
                 <p className="text-gray-700 leading-relaxed mb-4">
                   GullyStrayCare is dedicated to rescuing, rehabilitating, and rehoming street animals across India.
-                  Since our inception during the COVID-19 pandemic, we have been working tirelessly to provide food,
-                  medical care, and shelter to animals in need.
                 </p>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  Your donation directly supports our emergency rescue operations, medical treatments, sterilization
-                  programs, and adoption services. Every contribution, no matter the size, makes a real difference
-                  in an animal's life.
-                </p>
-
                 <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-xl p-5 mb-6 border border-orange-200">
                   <h3 className="font-semibold text-orange-900 mb-3">How Your Donation Helps:</h3>
                   <ul className="text-orange-800 space-y-2">
                     <li>• ₹25 - Feeds 1 street dog for a day</li>
                     <li>• ₹100 - Feeds 5 street dogs for a day</li>
-                    <li>• ₹250 - Basic medical care and vaccination</li>
                     <li>• ₹500 - Sterilization surgery for one animal</li>
-                    <li>• ₹1000 - Emergency surgery and rehabilitation</li>
-                    <li>• ₹2500 - Complete rescue and adoption process</li>
                   </ul>
                 </div>
               </div>
@@ -601,20 +538,6 @@ const PaymentPage = () => {
                     <div className="text-orange-600">gullystrayc@gmail.com</div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-orange-600" />
-                  <div>
-                    <div className="font-medium text-gray-900">Support Hours</div>
-                    <div className="text-gray-600">9:00 AM - 9:00 PM Daily</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Globe className="h-5 w-5 text-orange-600" />
-                  <div>
-                    <div className="font-medium text-gray-900">Coverage</div>
-                    <div className="text-gray-600">12+ Cities Across India</div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -631,64 +554,47 @@ const PaymentPage = () => {
                 </div>
               )}
 
+              {/* Donation Type Toggle */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Donation Frequency</label>
+                <div className="flex p-1 bg-gray-100 rounded-xl">
+                  <button
+                    onClick={() => setDonationType('onetime')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'onetime'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                    One-Time
+                  </button>
+                  <button
+                    onClick={() => setDonationType('monthly')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'monthly'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                    Monthly
+                  </button>
+                </div>
+              </div>
+
               {/* Select Amount */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-3">Select Amount</label>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  <button
-                    onClick={() => { setSelectedAmount(25); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 25 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹25
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(50); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 50 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹50
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(100); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 100 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹100
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(200); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 200 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹200
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(500); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 500 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹500
-                  </button>
-                  <button
-                    onClick={() => { setSelectedAmount(1000); setCustomAmount(''); }}
-                    className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === 1000 && !customAmount
-                      ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
-                      : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
-                      }`}
-                  >
-                    ₹1,000
-                  </button>
+                  {[25, 50, 100, 200, 500, 1000].map((amt) => (
+                    <button
+                      key={amt}
+                      onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
+                      className={`p-3 rounded-xl border-2 font-semibold transition-all duration-200 ${selectedAmount === amt && !customAmount
+                        ? 'border-orange-500 bg-orange-50 text-orange-700 shadow-md'
+                        : 'border-gray-200 hover:border-orange-300 text-gray-700 hover:bg-gray-50'
+                        }`}
+                    >
+                      ₹{amt}
+                    </button>
+                  ))}
                 </div>
                 <input
                   type="number"
@@ -798,51 +704,6 @@ const PaymentPage = () => {
               <div className="mt-4 flex items-center justify-center text-gray-500 text-sm">
                 <Shield className="h-4 w-4 mr-2 text-green-500" />
                 <span>Secured by Razorpay • SSL Encrypted</span>
-              </div>
-
-              {/* Tax Benefits Info */}
-              <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
-                <div className="flex items-center mb-2">
-                  <Award className="h-5 w-5 text-green-600 mr-2" />
-                  <span className="font-medium text-green-900">Tax Benefits Available</span>
-                </div>
-                <ul className="text-sm text-green-800 space-y-1">
-                  <li>• 80G Tax Certificate provided</li>
-                  <li>• Save up to 50% on taxes</li>
-                  <li>• Instant receipt via email</li>
-                  <li>• Valid for IT returns</li>
-                </ul>
-              </div>
-
-              {/* Quick Impact */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200">
-                <h4 className="font-medium text-gray-900 mb-2 flex items-center">
-                  <Heart className="h-5 w-5 text-red-500 mr-2" />
-                  Your Impact
-                </h4>
-                <div className="text-sm text-gray-700">
-                  {(customAmount || selectedAmount) >= 1000 && (customAmount || selectedAmount) < 2500 && (
-                    <p>• Emergency surgery & rehabilitation for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 500 && (customAmount || selectedAmount) < 1000 && (
-                    <p>• Sterilization surgery for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 200 && (customAmount || selectedAmount) < 500 && (
-                    <p>• Medical care & vaccination for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 100 && (customAmount || selectedAmount) < 200 && (
-                    <p>• Basic medical care for 1 animal</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 50 && (customAmount || selectedAmount) < 100 && (
-                    <p>• Feeds 2 street dogs for a day</p>
-                  )}
-                  {(customAmount || selectedAmount) >= 25 && (customAmount || selectedAmount) < 50 && (
-                    <p>• Feeds 1 street dog for a day</p>
-                  )}
-                  {(customAmount || selectedAmount) < 25 && (
-                    <p>• Feeds {Math.floor((customAmount || selectedAmount) / 25)} street dogs for a day</p>
-                  )}
-                </div>
               </div>
             </div>
           </div>

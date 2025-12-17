@@ -7,7 +7,18 @@ const crypto = require('crypto');
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://gullystraycare.org',
+        'https://www.gullystraycare.org',
+        'https://stray-care.vercel.app', // Fallback for Vercel subdomain
+        'http://localhost:5173', // Local development
+        'http://localhost:5174' // Local development fallback port
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -35,6 +46,43 @@ app.post('/api/payment/orders', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error creating order');
+    }
+});
+
+app.post('/api/payment/subscription', async (req, res) => {
+    try {
+        const { amount } = req.body;
+
+        // 1. Create a Plan (or you could fetch an existing one if you stored them)
+        // For simplicity, we create a new plan for every unique amount request
+        // In production, you should cache these plan_ids
+        const planResponse = await razorpay.plans.create({
+            period: "monthly",
+            interval: 1,
+            item: {
+                name: `Monthly Donation - ₹${amount}`,
+                amount: amount * 100,
+                currency: "INR",
+                description: "Monthly donation to GullyStray Care"
+            }
+        });
+
+        // 2. Create a Subscription
+        const subscription = await razorpay.subscriptions.create({
+            plan_id: planResponse.id,
+            total_count: 120, // 10 years
+            quantity: 1,
+            customer_notify: 1,
+        });
+
+        res.json({
+            subscription_id: subscription.id,
+            plan_id: planResponse.id
+        });
+
+    } catch (error) {
+        console.error('Subscription Error:', error);
+        res.status(500).json({ message: 'Error creating subscription', error: error.message });
     }
 });
 
