@@ -303,15 +303,6 @@ const PaymentPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-3">Donation Frequency</label>
                 <div className="flex p-1 bg-gray-100 rounded-xl">
                   <button
-                    onClick={() => setDonationType('onetime')}
-                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'onetime'
-                      ? 'bg-white text-orange-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                  >
-                    One-Time
-                  </button>
-                  <button
                     onClick={() => setDonationType('monthly')}
                     className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'monthly'
                       ? 'bg-white text-orange-600 shadow-sm'
@@ -319,6 +310,15 @@ const PaymentPage = () => {
                       }`}
                   >
                     Monthly
+                  </button>
+                  <button
+                    onClick={() => setDonationType('onetime')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'onetime'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                    One-Time
                   </button>
                 </div>
               </div>
@@ -559,15 +559,6 @@ const PaymentPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-3">Donation Frequency</label>
                 <div className="flex p-1 bg-gray-100 rounded-xl">
                   <button
-                    onClick={() => setDonationType('onetime')}
-                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'onetime'
-                      ? 'bg-white text-orange-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                  >
-                    One-Time
-                  </button>
-                  <button
                     onClick={() => setDonationType('monthly')}
                     className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'monthly'
                       ? 'bg-white text-orange-600 shadow-sm'
@@ -575,6 +566,15 @@ const PaymentPage = () => {
                       }`}
                   >
                     Monthly
+                  </button>
+                  <button
+                    onClick={() => setDonationType('onetime')}
+                    className={`flex-1 py-3 px-4 rounded-lg text-sm font-semibold transition-all duration-200 ${donationType === 'onetime'
+                      ? 'bg-white text-orange-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                    One-Time
                   </button>
                 </div>
               </div>
