@@ -80,7 +80,7 @@ const Services: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a href="tel:+91 93232 63322" className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors text-center">
-                  Call Emergency: +91 93232 63322 
+                  Call Emergency: +91 8425846304
                 </a>
                 <a href="mailto:emergency@gullystracare.org" className="border-2 border-white px-6 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors text-center">
                   Email Us

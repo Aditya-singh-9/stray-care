@@ -105,7 +105,7 @@ const PaymentPage = () => {
       const data = await response.json();
 
       const options: any = {
-        key: 'rzp_live_CVLoRP0AMxJhjw', // Replace with your actual key if different
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Key from environment variable
         name: 'GullyStray Care',
         description: donationType === 'monthly' ? 'Monthly Donation' : 'Donation for Animal Welfare',
         image: Logo,
